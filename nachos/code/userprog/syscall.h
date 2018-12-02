@@ -34,6 +34,10 @@
 #define SC_ExecV	13
 #define SC_ThreadExit   14
 #define SC_ThreadJoin   15
+#define SC_SendMessage	16
+#define SC_WaitMessage	17
+#define SC_SendAnswer	18
+#define SC_WaitAnswer	19
 
 #define SC_Add		42
 
@@ -173,6 +177,14 @@ int ThreadJoin(ThreadId id);
  * Deletes current thread and returns ExitCode to every waiting lokal thread.
  */
 void ThreadExit(int ExitCode);	
+
+void SendMessage(char *receiver, char *message, char *bufferName);
+
+void WaitMessage(char *sender, char *message, char *bufferName);
+
+void SendAnswer(char *result, char *answer, char *bufferName);
+
+void WaitAnswer(char *result, char *answer, char *bufferName);
 
 #endif /* IN_ASM */
 

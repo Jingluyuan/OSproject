@@ -177,6 +177,26 @@ ThreadJoin:
 	syscall
 	j 	$31
 	.end ThreadJoin
+SendMessage:
+	addiu $2, $0, SC_SendMessage
+	syscall
+	j 	$31
+	.end SendMessage
+WaitMessage:
+	addiu $2, $0, SC_WaitMessage
+	syscall
+	j 	$31
+	.end WaitMessage
+SendAnswer:
+	addiu $2, $0, SC_SendAnswer
+	syscall
+	j 	$31
+	.end SendAnswer
+WaitAnswer:
+	addiu $2, $0, SC_WaitAnswer
+	syscall
+	j 	$31
+	.end WaitAnswer
 	
 /* dummy function to keep gcc happy */
         .globl  __main
