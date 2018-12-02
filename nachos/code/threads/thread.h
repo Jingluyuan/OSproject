@@ -44,6 +44,12 @@
 #include "machine.h"
 #include "addrspace.h"
 
+//---------------------------------------
+#include "list.h"
+#include "MessageBuffer.h"
+
+//---------------------------------------
+
 // CPU register state to be saved on context switch.  
 // The x86 needs to save only a few registers, 
 // SPARC and MIPS needs to save 10 registers, 
@@ -123,6 +129,8 @@ class Thread {
 // while executing kernel code.
 
     int userRegisters[NumTotalRegs];	// user-level CPU register state
+
+    List<MsgBuffer *> MessageQueue;
 
   public:
     void SaveUserState();		// save user-level register state

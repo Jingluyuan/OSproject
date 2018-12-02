@@ -45,6 +45,8 @@ Thread::Thread(char* threadName)
 					// of machine registers
     }
     space = NULL;
+
+    MessageQueue = new List<MsgBuffer>;
 }
 
 //----------------------------------------------------------------------
