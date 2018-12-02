@@ -39,6 +39,14 @@ class AddrSpace {
     // is 0 for Read, 1 for Write.
     ExceptionType Translate(unsigned int vaddr, unsigned int *paddr, int mode);
 
+
+    void PageFaultHandler();
+
+    static bool freeMap[NumPhysPages];
+    static TranslationEntry *ptrPageTable[NumPhysPages];
+
+    OpenFile *swapFile;
+
   private:
     TranslationEntry *pageTable;	// Assume linear page table translation
 					// for now!
@@ -48,6 +56,7 @@ class AddrSpace {
     void InitRegisters();		// Initialize user-level CPU registers,
 					// before jumping to user code
 
+    static int pos;
 };
 
 #endif // ADDRSPACE_H
