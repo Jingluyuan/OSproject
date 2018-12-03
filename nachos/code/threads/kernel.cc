@@ -101,6 +101,8 @@ Kernel::Initialize()
     synchConsoleIn = new SynchConsoleInput(consoleIn); // input from stdin
     synchConsoleOut = new SynchConsoleOutput(consoleOut); // output to stdout
     synchDisk = new SynchDisk();    //
+    bufferPool = new BufferPool();
+    existList = new List<Thread *>;
 #ifdef FILESYS_STUB
     fileSystem = new FileSystem();
 #else
@@ -240,5 +242,59 @@ Kernel::NetworkTest() {
     }
 
     // Then we're done!
+}
+
+//despatch buffer in the pool to their receiver 
+void
+Kernel::DespatchBuffer()
+{
+
+}
+
+void 
+Kernel::DespatchTheBuffer(MsgBuffer* buffer)
+{
+    char* thread_name = buffer.getReceiver();
+
+    ListIterator<Thread *> *iter = new ListIterator(existList);
+    for (; !iter->IsDone(); iter->Next()) 
+    {
+        if (iter->item->getName()==thread_name)
+        {
+            iter->item->addBuffer(buffer); 
+        }
+      
+    }
+}
+
+void 
+Kernel::AddToThreadTable(Thread* thread)
+{
+    existList.Append(thread);
+}
+
+void 
+Kernel::RemoveFromThreadTable(Thread* thread)
+{
+    existList.Remove(thread);
+}
+
+Thread* 
+Kernel::getThread(char* threadName)
+{
+    ListIterator<Thread *> *iter = new ListIterator(existList);
+    for (; !iter->IsDone(); iter->Next()) 
+    {
+        if (iter->item->getName()==threadName)
+        {
+            return iter->item;
+        }
+      
+}
+
+bool 
+Kernel::isThreadExist(Thread* thread)
+{
+    return existList.IsInList(thread);
 }
 

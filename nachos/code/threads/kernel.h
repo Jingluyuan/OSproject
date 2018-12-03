@@ -40,6 +40,18 @@ class Kernel {
     void ConsoleTest();         // interactive console self test
 
     void NetworkTest();         // interactive 2-machine network test
+
+    void DespatchBuffer();      //despatch buffer to thread's buffer queue according to the receiver address
+
+    void DespatchTheBuffer(MsgBuffer* buffer); //despatch the input buffer to the target thread
+
+    void AddToThreadTable(Thread* thread);      //add a thread to the exist thread list
+
+    void RemoveFromThreadTable(Thread* thread);  //remove the thread which called finish() from the exist list
+
+    Thread* getThread(char* threadName);      //return the specific thread
+
+    bool isThreadExist(Thread* thread);     //if the thread is exist return true, else return false
     
 // These are public for notational convenience; really, 
 // they're global variables used everywhere.
@@ -56,6 +68,7 @@ class Kernel {
     FileSystem *fileSystem;     
     PostOfficeInput *postOfficeIn;
     PostOfficeOutput *postOfficeOut;
+    BufferPool *bufferPool;
 
     int hostName;               // machine identifier
 
@@ -65,6 +78,7 @@ class Kernel {
     double reliability;         // likelihood messages are dropped
     char *consoleIn;            // file to read console input from
     char *consoleOut;           // file to send console output to
+    List<Thread *> *existList;  // exist thread list
 #ifndef FILESYS_STUB
     bool formatFlag;          // format the disk if this is true
 #endif
