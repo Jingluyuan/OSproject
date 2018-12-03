@@ -1,5 +1,6 @@
 #include "bufferpool.h"
 #include "main.h"
+#include "string.h"
 
 BufferPool::BufferPool(){
 	bufferPool = new List<MsgBuffer>;
@@ -24,18 +25,12 @@ MsgBuffer*
 BufferPool::FindNextToUse(){
 	for(int i = 0; i < 20; i++){
 		MsgBuffer* mb = bufferPool->RemoveFront();
+		bufferPool.Append(mb);
 		if(!mb->getStatus){
-			break;
-		}else{
-			bufferPool.Append(mb);
+			return mb;
 		}
 	}
-//if there is no buffer to use, return NULL
-	if(!mb->getStatus){
-		return NULL;
-	}else{
-		return mb;
-	}
+	return NULL;
 }
 
 //----------------------------------------------------------------------
@@ -46,16 +41,15 @@ BufferPool::FindNextToUse(){
 
 MsgBuffer*
 BufferPool::Search(char* buffer_id){
-
+	string target = buffer_id;
+	for(int i = 0; i < 20; i++){
+		MsgBuffer* mb = bufferPool->RemoveFront();
+		string temp = mb->getId();
+		bufferPool.Append(mb);
+		if(target.compare(temp) == 0){
+			return mb;
+		}
+	}
+	return NULL;
 }
 
-//----------------------------------------------------------------------
-//	void BufferPool::Clean(MsgBuffer* msgbuffer)
-//	Clean the buffer, if it is not used anymore		
-//	Just modfied buffer status
-//----------------------------------------------------------------------
-
-void
-BufferPool::Clean(MsgBuffer* msgbuffer){
-
-}
