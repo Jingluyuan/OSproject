@@ -9,7 +9,9 @@ class BufferPool{
 		BufferPool();
 		~BufferPool();
 
-		MsgBuffer* FindNextToUse();
+		MsgBuffer* FindNextToUse(); //find next clean buffer
+		MsgBuffer* Search(char* buffer_id); //find specific buffer based on buffer id
+		void Clean(MsgBuffer* msgbuffer); //clean a buffer
 
 
 	private:

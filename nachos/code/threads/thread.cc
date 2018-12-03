@@ -46,7 +46,7 @@ Thread::Thread(char* threadName)
     }
     space = NULL;
 
-    MessageQueue = new List<MsgBuffer>;
+    MessageQueue = new List<MsgBuffer*>;
 }
 
 //----------------------------------------------------------------------
@@ -436,3 +436,24 @@ Thread::SelfTest()
     SimpleThread(0);
 }
 
+//----------------------------------------------------------------------
+//  Thread::deliverBuffer
+//  Deliver a buffer from pool to queue 
+//  TRUE add successfully, FALSE on the contary
+//----------------------------------------------------------------------
+
+ bool 
+ Thread::deliverBuffer(MsgBuffer* msgbuffer){
+
+ }
+
+//----------------------------------------------------------------------
+//  Thread::removeBuffer
+//  Remove a buffer from queue  
+//  TRUE remove successfully, FALSE on the contary
+//----------------------------------------------------------------------
+
+ bool 
+ Thread::removeBuffer(char* buffer_id){
+
+ }
