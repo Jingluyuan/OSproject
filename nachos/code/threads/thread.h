@@ -111,6 +111,8 @@ class Thread {
     void Print() { cout << name; }
     void SelfTest();		// test whether thread impl is working
 
+    bool deliverBuffer(MsgBuffer* msgbuffer); //deliverBuffer from pool to queue
+    bool removeBuffer(char* buffer_id); //remove specific buffer from queue
   private:
     // some of the private data for this class is listed above
     
