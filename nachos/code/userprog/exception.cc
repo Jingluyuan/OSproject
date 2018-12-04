@@ -141,8 +141,8 @@ ExceptionHandler(ExceptionType which)
           char *bufferName = getStringInMem(bufferAddr);
           char *sender = kernel->currentThread->getName();
 
-          //to do ---isWaiting(bufferName)
-          if (kernel->getThread(receiver)->isWaiting(bufferName)) {
+          //to do --isWaiting(bufferName)
+          if (kernel->isThreadExist(receiver) && kernel->getThread(receiver)->isWaiting(bufferName)) {
             MsgBuffer buffer = kernel->bufferpool->Search(bufferName);
             buffer.setMessage(message);
             buffer.setStatus(true);
