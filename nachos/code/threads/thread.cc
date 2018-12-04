@@ -455,8 +455,7 @@ Thread::SelfTest()
  {
     if(kernel->isThreadExist(msgbuffer->getReceiver())){
         Thread *target = kernel->getThread(msgbuffer->getReceiver());
-        List<MsgBuffer *> queue = target->getMsgQueue();
-        queue.Append(msgbuffer);
+        MessageQueue->Append(msgbuffer);
         return TRUE;
     }
     return FALSE;
@@ -471,15 +470,14 @@ Thread::SelfTest()
  bool 
  Thread::removeBuffer(char* buffer_id)
  {
-    List<MsgBuffer *> queue = this->getMsgQueue();
     string target = buffer_id;
-    for(int i = 0; i < queue.NumInList(); i++){
-        MsgBuffer* mb = queue->RemoveFront();
+    for(int i = 0; i < MessageQueue->NumInList(); i++){
+        MsgBuffer* mb = MessageQueue->RemoveFront();
         string temp = mb->getId();
         if(target.compare(temp) == 0){
             return true;
         }
-        queue.Append(mb);
+        MessageQueue->Append(mb);
     }
     return FALSE;
  }
@@ -493,12 +491,11 @@ Thread::SelfTest()
  bool 
  Thread::contains(char* buffer_id)
  {  
-    List<MsgBuffer *> queue = this->getMsgQueue();
     string target = buffer_id;
-    for(int i = 0; i < queue.NumInList(); i++){
-        MsgBuffer* mb = queue->RemoveFront();
+    for(int i = 0; i < MessageQueue->NumInList(); i++){
+        MsgBuffer* mb = MessageQueue->RemoveFront();
         string temp = mb->getId();
-        queue.Append(mb);
+        MessageQueue->Append(mb);
         if(target.compare(temp) == 0){
             return true;
         }
@@ -515,6 +512,5 @@ Thread::SelfTest()
  void 
  Thread::addBuffer(MsgBuffer* msgbuffer)
  {
-    List<MsgBuffer *> queue = this->getMsgQueue();
-    queue.Append(msgbuffer);
+    MessageQueue->Append(msgbuffer);
  }

@@ -7,7 +7,7 @@ BufferPool::BufferPool(){
 //initialize 20 buffers 
 	for(int i = 0; i < 20; i++){
 		MsgBuffer *mb = new MsgBuffer();
-		bufferPool.Append(mb);
+		bufferPool->Append(mb);
 	}
 }
 
@@ -23,15 +23,15 @@ BufferPool::~BufferPool(){
 
 MsgBuffer*
 BufferPool::FindNextToUse(){
-	for(int i = 0; i < bufferPool.NumInList(); i++){
-		MsgBuffer* mb = bufferPool.RemoveFront();
-		bufferPool.Append(mb);
+	for(int i = 0; i < bufferPool->NumInList(); i++){
+		MsgBuffer* mb = bufferPool->RemoveFront();
+		bufferPool->Append(mb);
 		if(!mb->getStatus){
 			return mb;
 		}
 	}
 	MsgBuffer* nmb = new MsgBuffer();
-	bufferPool.Append(nmb);
+	bufferPool->Append(nmb);
 	return nmb;
 }
 
@@ -44,10 +44,10 @@ BufferPool::FindNextToUse(){
 MsgBuffer*
 BufferPool::Search(char* buffer_id){
 	string target = buffer_id;
-	for(int i = 0; i < bufferPool.NumInList(); i++){
-		MsgBuffer* mb = bufferPool.RemoveFront();
+	for(int i = 0; i < bufferPool->NumInList(); i++){
+		MsgBuffer* mb = bufferPool->RemoveFront();
 		string temp = mb->getId();
-		bufferPool.Append(mb);
+		bufferPool->Append(mb);
 		if(target.compare(temp) == 0){
 			return mb;
 		}
