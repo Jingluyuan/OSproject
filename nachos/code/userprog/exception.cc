@@ -193,6 +193,7 @@ ExceptionHandler(ExceptionType which)
           }
           else {
             cout << "sender: " << sender << " dose not exist!" << endl;
+            writeInToMen("message from kerenl, sender dose not exist!", msgAddr);
           }
           break;
         }
