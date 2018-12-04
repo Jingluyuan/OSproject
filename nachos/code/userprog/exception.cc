@@ -230,6 +230,26 @@ ExceptionHandler(ExceptionType which)
 
         case SC_WaitAnswer:
         {
+          int resAddr = kernel->machine->ReadRegister(4);
+          int ansAddr = kernel->machine->ReadRegister(5);
+          int bufferAddr = kernel->machine->ReadRegister(6);
+
+          char *bufferName = getStringInMem(bufferAddr);
+
+          if (kernel->bufferpool->Search(bufferName) == NULL) {
+            cout << "error! no buffer exits!" << endl;
+            break;
+          }
+
+          if (kernel->currentThread->contains(bufferName)) {
+            MsgBuffer *buffer = kernel->bufferpool->Search(bufferName);
+            writeInToMen(buffer->getMessage(), ansAddr);
+            writeInToMen(buffer->getResult(), resAddr);
+          }
+          else {
+            
+          }
+
           break;
         }
 
