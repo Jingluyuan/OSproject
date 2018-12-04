@@ -182,7 +182,8 @@ main(int argc, char **argv)
 {
     int i;
     char *debugArg = "";
-    char *userProgName = NULL;        // default is not to execute a user prog
+    char **userProgName = (char**)malloc(sizeof(char*) * 20); 
+    int idx = 0;       // default is not to execute a user prog
     bool threadTestFlag = false;
     bool consoleTestFlag = false;
     bool networkTestFlag = false;
@@ -209,7 +210,8 @@ main(int argc, char **argv)
 	}
 	else if (strcmp(argv[i], "-x") == 0) {
 	    ASSERT(i + 1 < argc);
-	    userProgName = argv[i + 1];
+        userProgName[idx] = (char*)malloc(sizeof(char) * (20));
+	    userProgName[idx++] = argv[i + 1];
 	    i++;
 	}
 	else if (strcmp(argv[i], "-K") == 0) {
@@ -299,8 +301,13 @@ main(int argc, char **argv)
 #endif // FILESYS_STUB
 
     // finally, run an initial user program if requested to do so
-    if (userProgName != NULL) {
-      RunUserProg(userProgName);
+    if (userProgName != NULL && idx > 0) {
+      //RunUserProg(userProgName);
+        for (int i = 0; i < idx; i++) {
+            Thread *t = new Thread(userProgName[i]);
+            t->Fork((VoidFunctionPtr) RunUserProg,userProgName[i]);
+        }
+        
     }
 
     // NOTE: if the procedure "main" returns, then the program "nachos"

@@ -146,15 +146,13 @@ ExceptionHandler(ExceptionType which)
             buffer.setReceiver(receiver);
             buffer.setId(bufferName);
             buffer.setMessage(message);
+            buffer.setStatus(true);
 
             kernel->getThread->deliverBuffer(buffer);
           }
           else {
             cout <<"reciver " << receiver << "not exist!" << endl;
           }
-
-          
-
 
           break;
         }
