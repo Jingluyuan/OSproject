@@ -146,6 +146,8 @@ ExceptionHandler(ExceptionType which)
             MsgBuffer *buffer = kernel->bufferpool->Search(bufferName);
             buffer->setMessage(message);
             buffer->setStatus(true);
+
+            kernel->scheduler->ReadyToRun(kernel->getThread(receiver));
           }
 
           else if (kernel->isThreadExist(receiver)) {
@@ -183,10 +185,11 @@ ExceptionHandler(ExceptionType which)
             buffer->setSender(sender);
             buffer->setReceiver(receiver);
             buffer->setId(bufferName);
-            buffer->setMessage(message);
             buffer->setStatus(true);
 
             kernel->currentThread->deliverBuffer(buffer);
+
+            kernel->currentThread->Sleep();
           }
           else {
             cout << "sender: " << sender << " dose not exist!" << endl;
@@ -196,10 +199,11 @@ ExceptionHandler(ExceptionType which)
 
         case SC_SendAnswer:
         {
+
           break;
         }
 
-        case SC_SendAnswer:
+        case SC_WaitAnswer:
         {
           break;
         }
