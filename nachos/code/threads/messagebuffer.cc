@@ -63,3 +63,14 @@ MsgBuffer::setStatus(bool status)
 	_used = status;
 }
 
+char*
+MsgBuffer::getResult()
+{
+	return _result;
+}
+
+void
+MsgBuffer::setResult(char* result)
+{
+	_result = result;
+}
