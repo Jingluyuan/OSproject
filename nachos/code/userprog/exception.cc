@@ -141,20 +141,20 @@ ExceptionHandler(ExceptionType which)
           char *bufferName = getStringInMem(bufferAddr);
           char *sender = kernel->currentThread->getName();
 
-          //to do --isWaiting(bufferName)
-          if (kernel->isThreadExist(receiver) && kernel->getThread(receiver)->isWaiting(bufferName)) {
-            MsgBuffer buffer = kernel->bufferpool->Search(bufferName);
-            buffer.setMessage(message);
-            buffer.setStatus(true);
+          //to do --contains(bufferName)
+          if (kernel->isThreadExist(receiver) && kernel->getThread(receiver)->contains(bufferName)) {
+            MsgBuffer *buffer = kernel->bufferpool->Search(bufferName);
+            buffer->setMessage(message);
+            buffer->setStatus(true);
           }
 
           else if (kernel->isThreadExist(receiver)) {
-            MsgBuffer buffer = kernel->bufferPool->FindNextToUse();
-            buffer.setSender(sender);
-            buffer.setReceiver(receiver);
-            buffer.setId(bufferName);
-            buffer.setMessage(message);
-            buffer.setStatus(true);
+            MsgBuffer *buffer = kernel->bufferPool->FindNextToUse();
+            buffer->setSender(sender);
+            buffer->setReceiver(receiver);
+            buffer->setId(bufferName);
+            buffer->setMessage(message);
+            buffer->setStatus(true);
             ///to do
             kernel->getThread(receiver)->deliverBuffer(buffer);
           }
@@ -167,7 +167,30 @@ ExceptionHandler(ExceptionType which)
 
         case SC_WaitMessage:
         {
+          int senderAddr = kernel->machine->ReadRegister(4);
+          int msgAddr = kernel->machine->ReadRegister(5);
+          int bufferAddr = kernel->machine->ReadRegister(6);
+          char *sender = getStringInMem(senderAddr);
+          char *bufferName = getStringInMem(bufferAddr);
+          char *receiver = kernel->currentThread->getName();
           
+          if (kernel->currentThread->contains(bufferName)) {
+            MsgBuffer *buffer = kernel->bufferpool->Search(bufferName);
+            writeInToMen(buffer->getMessage(), msgAddr);
+          }
+          else if (kernel->isThreadExist(sender)) {
+            MsgBuffer *buffer = kernel->bufferPool->FindNextToUse();
+            buffer->setSender(sender);
+            buffer->setReceiver(receiver);
+            buffer->setId(bufferName);
+            buffer->setMessage(message);
+            buffer->setStatus(true);
+
+            kernel->currentThread->deliverBuffer(buffer);
+          }
+          else {
+            cout << "sender: " << sender << " dose not exist!" << endl;
+          }
           break;
         }
 
