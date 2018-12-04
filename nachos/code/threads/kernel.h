@@ -41,8 +41,6 @@ class Kernel {
 
     void NetworkTest();         // interactive 2-machine network test
 
-    void DespatchBuffer();      //despatch buffer to thread's buffer queue according to the receiver address
-
     void DespatchTheBuffer(MsgBuffer* buffer); //despatch the input buffer to the target thread
 
     void AddToThreadTable(Thread* thread);      //add a thread to the exist thread list
@@ -51,7 +49,7 @@ class Kernel {
 
     Thread* getThread(char* threadName);      //return the specific thread
 
-    bool isThreadExist(Thread* thread);     //if the thread is exist return true, else return false
+    bool isThreadExist(char* threadName);     //if the thread is exist return true, else return false
     
 // These are public for notational convenience; really, 
 // they're global variables used everywhere.

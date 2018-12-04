@@ -244,12 +244,6 @@ Kernel::NetworkTest() {
     // Then we're done!
 }
 
-//despatch buffer in the pool to their receiver 
-void
-Kernel::DespatchBuffer()
-{
-
-}
 
 void 
 Kernel::DespatchTheBuffer(MsgBuffer* buffer)
