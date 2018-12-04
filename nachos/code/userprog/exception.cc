@@ -211,11 +211,18 @@ ExceptionHandler(ExceptionType which)
           char *sender = buffer->getSender();
           char *reciver = buffer->getReceiver();
           
+          buffer->setMessage(answer);
 
           if (kernel->isThreadExist(sender) && kernel->getThread(sender)->contains(bufferName)) {
-            buffer->setMessage(answer);
-
+            
             kernel->scheduler->ReadyToRun(kernel->getThread(sender));
+          }
+          else if (kernel->isThreadExist(sender)) {
+            ///to do
+            kernel->getThread(sender)->deliverBuffer(buffer);
+          }
+          else {
+            cout << "error" << endl;
           }
           break;
         }
