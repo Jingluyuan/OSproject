@@ -74,3 +74,15 @@ MsgBuffer::setResult(char* result)
 {
 	_result = result;
 }
+
+char*
+MsgBuffer::getAnswer()
+{
+	return _answer;
+}
+
+void
+MsgBuffer::setAnswer(char* answer)
+{
+	_answer = answer;
+}

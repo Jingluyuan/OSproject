@@ -14,6 +14,7 @@ private:
 	char* _message;		//  message input
 	bool _used;			// the status of the buffer  true means currently being used; false means currently unused
 	char* _result;
+	char* _answer;
 
 
 public:
@@ -33,6 +34,8 @@ public:
 	void setStatus(bool status);
 	char* getResult();
 	void setResult(char* result);
+	char* getAnswer();
+	void setAnswer(char* answer);
 }
 
 
