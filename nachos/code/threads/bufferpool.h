@@ -2,7 +2,7 @@
 #define BUFFERPOOL_H
 
 #include "list.h"
-#include "MessageBuffer.h"
+#include "messagebuffer.h"
 
 class BufferPool{
 	public:
