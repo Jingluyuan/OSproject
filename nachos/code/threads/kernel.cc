@@ -254,12 +254,14 @@ Kernel::DespatchBuffer()
 void 
 Kernel::DespatchTheBuffer(MsgBuffer* buffer)
 {
-    char* thread_name = buffer.getReceiver();
+    string thread_name = buffer.getReceiver();
+     
 
     ListIterator<Thread *> *iter = new ListIterator(existList);
     for (; !iter->IsDone(); iter->Next()) 
     {
-        if (iter->item->getName()==thread_name)
+        string tmp = iter->item->getName();
+        if (tmp == thread_name)
         {
             iter->item->addBuffer(buffer); 
         }
@@ -282,10 +284,12 @@ Kernel::RemoveFromThreadTable(Thread* thread)
 Thread* 
 Kernel::getThread(char* threadName)
 {
+    string thread_name = threadName;
     ListIterator<Thread *> *iter = new ListIterator(existList);
     for (; !iter->IsDone(); iter->Next()) 
     {
-        if (iter->item->getName()==threadName)
+        string tmp = iter->item->getName();
+        if (tmp == threadName)
         {
             return iter->item;
         }
