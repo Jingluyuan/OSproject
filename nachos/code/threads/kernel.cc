@@ -293,12 +293,24 @@ Kernel::getThread(char* threadName)
         {
             return iter->item;
         }
+    }
       
 }
 
 bool 
-Kernel::isThreadExist(Thread* thread)
+Kernel::isThreadExist(char* threadName)
 {
-    return existList.IsInList(thread);
+    string thread_name = threadName;
+    ListIterator<Thread *> *iter = new ListIterator(existList);
+    for (; !iter->IsDone(); iter->Next()) 
+    {
+        string tmp = iter->item->getName();
+        if (tmp == threadName)
+        {
+            return true;
+        }
+    }
+    
+    return false;
 }
 

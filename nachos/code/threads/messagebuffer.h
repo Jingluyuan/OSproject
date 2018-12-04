@@ -8,11 +8,11 @@
 
 class MsgBuffer{
 private:
-	char* _sender;
-	char* _receiver;
-	char* _buffer_id;
-	char* _message;
-	bool _used;
+	char* _sender;     	// sender thread's name
+	char* _receiver;	//  resceiver thread's name
+	char* _buffer_id;	//   buffer's identify id
+	char* _message;		//  message input
+	bool _used;			// the status of the buffer  true means currently being used; false means currently unused
 
 
 public:
