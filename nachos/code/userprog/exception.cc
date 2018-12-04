@@ -132,7 +132,7 @@ ExceptionHandler(ExceptionType which)
 
         case SC_SendMessage:
         {
-          MsgBuffer buffer = kernel->bufferPool->FindNextToUse();
+          
           int receiverAddr = kernel->machine->ReadRegister(4);
           int msgAddr = kernel->machine->ReadRegister(5);
           int bufferAddr = kernel->machine->ReadRegister(6);
@@ -141,14 +141,22 @@ ExceptionHandler(ExceptionType which)
           char *bufferName = getStringInMem(bufferAddr);
           char *sender = kernel->currentThread->getName();
 
-          if (kernel->isThreadExist(receiver)) {
+          //to do ---isWaiting(bufferName)
+          if (kernel->getThread(receiver)->isWaiting(bufferName)) {
+            MsgBuffer buffer = kernel->bufferpool->Search(bufferName);
+            buffer.setMessage(message);
+            buffer.setStatus(true);
+          }
+
+          else if (kernel->isThreadExist(receiver)) {
+            MsgBuffer buffer = kernel->bufferPool->FindNextToUse();
             buffer.setSender(sender);
             buffer.setReceiver(receiver);
             buffer.setId(bufferName);
             buffer.setMessage(message);
             buffer.setStatus(true);
-
-            kernel->getThread->deliverBuffer(buffer);
+            ///to do
+            kernel->getThread(receiver)->deliverBuffer(buffer);
           }
           else {
             cout <<"reciver " << receiver << "not exist!" << endl;
