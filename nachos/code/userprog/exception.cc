@@ -30,6 +30,7 @@
 #include "kernel.h"
 #include "interrupt.h"
 #include "machine.h"
+#include "bufferpool.h"
 
 
 #include <stdlib.h>
@@ -59,7 +60,35 @@
 //  "which" is the kind of exception.  The list of possible exceptions
 //  is in machine.h.
 //----------------------------------------------------------------------
+char * getStringInMem(int addr) {
+  string name;
+  int c;
 
+  while (1) {
+    if (!kernel->machine->ReadMem(base+i,1,&c)) {
+        kernel->machine->ReadMem(base+i,1,&c);
+    }
+    if ((char)val != '\0') {
+      name += char(c);
+      addr++;
+    }
+    else {
+      break;
+    }
+    
+  }
+
+  std::stringstream out;
+  out << name;
+  s = out.str();
+  return (char*)s.c_str();
+}
+
+void writeInToMen(char *str, int ptr) {
+  for (int i = ptr, j = 0; j < strlen(str); i++, j++) {
+    kernel->machine->WriteMem(i, 1, (int)*(str+j));
+  }
+}
 
 void
 ExceptionHandler(ExceptionType which)
@@ -103,6 +132,30 @@ ExceptionHandler(ExceptionType which)
 
         case SC_SendMessage:
         {
+          MsgBuffer buffer = kernel->bufferPool->FindNextToUse();
+          int receiverAddr = kernel->machine->ReadRegister(4);
+          int msgAddr = kernel->machine->ReadRegister(5);
+          int bufferAddr = kernel->machine->ReadRegister(6);
+          char *receiver = getStringInMem(receiverAddr);
+          char *message = getStringInMem(msgAddr);
+          char *bufferName = getStringInMem(bufferAddr);
+          char *sender = kernel->currentThread->getName();
+
+          if (kernel->isThreadExist(receiver)) {
+            buffer.setSender(sender);
+            buffer.setReceiver(receiver);
+            buffer.setId(bufferName);
+            buffer.setMessage(message);
+
+            kernel->getThread->deliverBuffer(buffer);
+          }
+          else {
+            cout <<"reciver " << receiver << "not exist!" << endl;
+          }
+
+          
+
+
           break;
         }
 
