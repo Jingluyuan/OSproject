@@ -516,5 +516,5 @@ Thread::SelfTest()
  Thread::addBuffer(MsgBuffer* msgbuffer)
  {
     List<MsgBuffer *> queue = this->getMsgQueue();
-    queue.Aooend(msgbuffer);
+    queue.Append(msgbuffer);
  }
