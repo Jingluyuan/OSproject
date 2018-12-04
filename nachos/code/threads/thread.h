@@ -113,6 +113,8 @@ class Thread {
 
     bool deliverBuffer(MsgBuffer* msgbuffer); //deliverBuffer from pool to queue
     bool removeBuffer(char* buffer_id); //remove specific buffer from queue
+    bool contains(char* buffer_id); //whether thread get buffer
+    void addBuffer(MsgBuffer* msgbuffer); //add buffer to queue
     List<MsgBuffer *> getMsgQueue() {return (MessageQueue)};
   private:
     // some of the private data for this class is listed above

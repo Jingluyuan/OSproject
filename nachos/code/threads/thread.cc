@@ -453,8 +453,8 @@ Thread::SelfTest()
  bool 
  Thread::deliverBuffer(MsgBuffer* msgbuffer)
  {
-    Thread* target = kernel->getThread(msgbuffer->getReceiver());
-    if(kernel->isThreadExist(target)){
+    if(kernel->isThreadExist(msgbuffer->getReceiver())){
+        Thread *target = kernel->getThread(msgbuffer->getReceiver());
         List<MsgBuffer *> queue = target->getMsgQueue();
         queue.Append(msgbuffer);
         return TRUE;
@@ -482,4 +482,39 @@ Thread::SelfTest()
         queue.Append(mb);
     }
     return FALSE;
+ }
+
+//----------------------------------------------------------------------
+//  Thread::contains
+//  Determine whether thread get specific buffer  
+//  TRUE get successfully, FALSE on the contary
+//----------------------------------------------------------------------
+
+ bool 
+ Thread::contains(char* buffer_id)
+ {  
+    List<MsgBuffer *> queue = this->getMsgQueue();
+    string target = buffer_id;
+    for(int i = 0; i < queue.NumInList(); i++){
+        MsgBuffer* mb = bufferPool->RemoveFront();
+        string temp = mb->getId();
+        queue.Append(mb);
+        if(target.compare(temp) == 0){
+            return true;
+        }
+    }
+    return FALSE;
+ }
+
+//----------------------------------------------------------------------
+//  Thread::contains
+//  Determine whether thread get specific buffer  
+//  TRUE get successfully, FALSE on the contary
+//----------------------------------------------------------------------
+
+ void 
+ Thread::addBuffer(MsgBuffer* msgbuffer)
+ {
+    List<MsgBuffer *> queue = this->getMsgQueue();
+    queue.Aooend(msgbuffer);
  }
