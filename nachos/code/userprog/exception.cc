@@ -197,9 +197,26 @@ ExceptionHandler(ExceptionType which)
           break;
         }
 
-        case SC_SendAnswer:
+        case SC_SendAnswer: //receiver and sender reverse
         {
+          int resAddr = kernel->machine->ReadRegister(4);
+          int ansAddr = kernel->machine->ReadRegister(5);
+          int bufferAddr = kernel->machine->ReadRegister(6);
 
+          char *result = getStringInMem(resAddr);
+          char *answer = getStringInMem(ansAddr);
+          char *bufferName = getStringInMem(bufferAddr);
+
+          MsgBuffer *buffer = kernel->bufferpool->Search(bufferName);
+          char *sender = buffer->getSender();
+          char *reciver = buffer->getReceiver();
+          
+
+          if (kernel->isThreadExist(sender) && kernel->getThread(sender)->contains(bufferName)) {
+            buffer->setMessage(answer);
+
+            kernel->scheduler->ReadyToRun(kernel->getThread(sender));
+          }
           break;
         }
 
