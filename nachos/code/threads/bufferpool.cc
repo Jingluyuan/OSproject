@@ -23,14 +23,16 @@ BufferPool::~BufferPool(){
 
 MsgBuffer*
 BufferPool::FindNextToUse(){
-	for(int i = 0; i < 20; i++){
+	for(int i = 0; i < bufferPool.NumInList(); i++){
 		MsgBuffer* mb = bufferPool.RemoveFront();
 		bufferPool.Append(mb);
 		if(!mb->getStatus){
 			return mb;
 		}
 	}
-	return NULL;
+	MsgBuffer* nmb = new MsgBuffer();
+	bufferPool.Append(nmb);
+	return nmb;
 }
 
 //----------------------------------------------------------------------
@@ -42,7 +44,7 @@ BufferPool::FindNextToUse(){
 MsgBuffer*
 BufferPool::Search(char* buffer_id){
 	string target = buffer_id;
-	for(int i = 0; i < 20; i++){
+	for(int i = 0; i < bufferPool.NumInList(); i++){
 		MsgBuffer* mb = bufferPool.RemoveFront();
 		string temp = mb->getId();
 		bufferPool.Append(mb);
