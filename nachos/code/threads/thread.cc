@@ -474,7 +474,7 @@ Thread::SelfTest()
     List<MsgBuffer *> queue = this->getMsgQueue();
     string target = buffer_id;
     for(int i = 0; i < queue.NumInList(); i++){
-        MsgBuffer* mb = bufferPool->RemoveFront();
+        MsgBuffer* mb = queue->RemoveFront();
         string temp = mb->getId();
         if(target.compare(temp) == 0){
             return true;
@@ -496,7 +496,7 @@ Thread::SelfTest()
     List<MsgBuffer *> queue = this->getMsgQueue();
     string target = buffer_id;
     for(int i = 0; i < queue.NumInList(); i++){
-        MsgBuffer* mb = bufferPool->RemoveFront();
+        MsgBuffer* mb = queue->RemoveFront();
         string temp = mb->getId();
         queue.Append(mb);
         if(target.compare(temp) == 0){
