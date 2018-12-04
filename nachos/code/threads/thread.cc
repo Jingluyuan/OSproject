@@ -21,6 +21,7 @@
 #include "switch.h"
 #include "synch.h"
 #include "sysdep.h"
+#include "string.h"
 
 // this is put at the top of the execution stack, for detecting stack overflows
 const int STACK_FENCEPOST = 0xdedbeef;
@@ -99,11 +100,16 @@ Thread::Fork(VoidFunctionPtr func, void *arg)
     
     DEBUG(dbgThread, "Forking thread: " << name << " f(a): " << (int) func << " " << arg);
     
+    kernel->AddToThreadTable(kernel->currentThread);//add thread to thread table
+
     StackAllocate(func, arg);
 
     oldLevel = interrupt->SetLevel(IntOff);
     scheduler->ReadyToRun(this);	// ReadyToRun assumes that interrupts 
 					// are disabled!
+
+
+
     (void) interrupt->SetLevel(oldLevel);
 }    
 
@@ -178,6 +184,8 @@ Thread::Finish ()
     
     DEBUG(dbgThread, "Finishing thread: " << name);
     
+    kernel->RemoveFromThreadTable(kernel->currentThread);//remove thread from thread table
+
     Sleep(TRUE);				// invokes SWITCH
     // not reached
 }
@@ -443,8 +451,15 @@ Thread::SelfTest()
 //----------------------------------------------------------------------
 
  bool 
- Thread::deliverBuffer(MsgBuffer* msgbuffer){
-
+ Thread::deliverBuffer(MsgBuffer* msgbuffer)
+ {
+    Thread* target = kernel->getThread(msgbuffer->getReceiver());
+    if(kernel->isThreadExist(target)){
+        List<MsgBuffer *> queue = target->getMsgQueue();
+        queue.Append(msgbuffer);
+        return TRUE;
+    }
+    return FALSE;
  }
 
 //----------------------------------------------------------------------
@@ -454,6 +469,17 @@ Thread::SelfTest()
 //----------------------------------------------------------------------
 
  bool 
- Thread::removeBuffer(char* buffer_id){
-
+ Thread::removeBuffer(char* buffer_id)
+ {
+    List<MsgBuffer *> queue = this->getMsgQueue();
+    string target = buffer_id;
+    for(int i = 0; i < queue.NumInList(); i++){
+        MsgBuffer* mb = bufferPool->RemoveFront();
+        string temp = mb->getId();
+        if(target.compare(temp) == 0){
+            return true;
+        }
+        queue.Append(mb);
+    }
+    return FALSE;
  }
