@@ -48,9 +48,9 @@ class Kernel {
 
     void RemoveFromThreadTable(Thread* thread);  //remove the thread which called finish() from the exist list
 
-    Thread* getThread(char* threadName);      //return the specific thread
+    Thread* getThread(string threadName);      //return the specific thread
 
-    bool isThreadExist(char* threadName);     //if the thread is exist return true, else return false
+    bool isThreadExist(string threadName);     //if the thread is exist return true, else return false
     
 // These are public for notational convenience; really, 
 // they're global variables used everywhere.
