@@ -158,7 +158,7 @@ ExceptionHandler(ExceptionType which)
             buffer->setMessage(message);
             buffer->setStatus(true);
             ///to do
-            kernel->getThread(receiver)->deliverBuffer(buffer);
+            kernel->getThread(receiver)->addBuffer(buffer);
           }
           else {
             cout <<"reciver " << receiver << "not exist!" << endl;
@@ -187,14 +187,18 @@ ExceptionHandler(ExceptionType which)
             buffer->setId(bufferName);
             buffer->setStatus(true);
 
-            kernel->currentThread->deliverBuffer(buffer);
+            kernel->currentThread->addBuffer(buffer);
 
             kernel->currentThread->Sleep();
+
+            writeInToMen(buffer->getMessage(), msgAddr);
+            
           }
           else {
             cout << "sender: " << sender << " dose not exist!" << endl;
             writeInToMen("message from kerenl, sender dose not exist!", msgAddr);
           }
+          kernel->currentThread->removeBuffer(bufferName);
           break;
         }
 
@@ -212,7 +216,8 @@ ExceptionHandler(ExceptionType which)
           char *sender = buffer->getSender();
           char *reciver = buffer->getReceiver();
           
-          buffer->setMessage(answer);
+          buffer->setAnswer(answer);
+          buffer->setResult(result);
 
           if (kernel->isThreadExist(sender) && kernel->getThread(sender)->contains(bufferName)) {
             
@@ -220,7 +225,7 @@ ExceptionHandler(ExceptionType which)
           }
           else if (kernel->isThreadExist(sender)) {
             ///to do
-            kernel->getThread(sender)->deliverBuffer(buffer);
+            kernel->getThread(sender)->addBuffer(buffer);
           }
           else {
             cout << "error" << endl;
@@ -241,15 +246,25 @@ ExceptionHandler(ExceptionType which)
             break;
           }
 
+          MsgBuffer *buffer = kernel->bufferpool->Search(bufferName);
           if (kernel->currentThread->contains(bufferName)) {
-            MsgBuffer *buffer = kernel->bufferpool->Search(bufferName);
-            writeInToMen(buffer->getMessage(), ansAddr);
+            
+            writeInToMen(buffer->getAnswer(), ansAddr);
+            writeInToMen(buffer->getResult(), resAddr);
+          }
+          else if (kernel->isThreadExist(receiver)) {
+            kernel->currentThread->addBuffer(buffer);
+
+            kernel->currentThread->Sleep();
+
+            writeInToMen(buffer->getAnswer(), ansAddr);
             writeInToMen(buffer->getResult(), resAddr);
           }
           else {
-            
+            writeInToMen("message from kerenl, receiver dose not exist!", msgAddr);
           }
-
+          buffer->setStatus(false);
+          kernel->currentThread->removeBuffer(bufferName);
           break;
         }
 

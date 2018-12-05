@@ -13,7 +13,7 @@ int main() {
 	}
 
 	if (ans == "ACK J+1") {
-		string msg;
+		char* msg;
 		WaitMessage("server", msg, "buffer2");
 		if (msg == "SYN K") {
 			SendAnswer("permit", "ACK K+1", "buffer2");
