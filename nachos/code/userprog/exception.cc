@@ -151,7 +151,7 @@ ExceptionHandler(ExceptionType which)
           }
 
           else if (kernel->isThreadExist(receiver)) {
-            MsgBuffer *buffer = kernel->bufferPool->FindNextToUse();
+            MsgBuffer *buffer = kernel->bufferPool->FindNextToUse(bufferName);
             buffer->setSender(sender);
             buffer->setReceiver(receiver);
             buffer->setId(bufferName);
