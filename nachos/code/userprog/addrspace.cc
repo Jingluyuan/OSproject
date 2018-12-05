@@ -21,9 +21,8 @@
 #include "machine.h"
 #include "noff.h"
 
-int AddrSpace::pos = 0;
-TranslationEntry * AddrSpace::ptrPageTable[NumPhysPages]={NULL};
-bool AddrSpace::freeMap[NumPhysPages] = {0};
+int AddrSpace::mark = 0;
+
 //----------------------------------------------------------------------
 // SwapHeader
 // 	Do little endian to big endian conversion on the bytes in the 
@@ -97,8 +96,6 @@ bool
 AddrSpace::Load(char *fileName) 
 {
     OpenFile *executable = kernel->fileSystem->Open(fileName);
-    kernel->fileSystem->Create("SwapFile");
-    swapFile = kernel->fileSystem->Open("SwapFile");
     NoffHeader noffH;
     unsigned int size;
 
@@ -128,64 +125,54 @@ AddrSpace::Load(char *fileName)
     numPages = divRoundUp(size, PageSize);
     size = numPages * PageSize;
 
-    //ASSERT(numPages <= NumPhysPages);		// check we're not trying
+    ASSERT(numPages <= NumPhysPages);		// check we're not trying
 						// to run anything too big --
 						// at least until we have
 						// virtual memory
 
     DEBUG(dbgAddr, "Initializing address space: " << numPages << ", " << size);
-    // pos + numPages > NumPhysPages ? 
+
     pageTable = new TranslationEntry[numPages];
     for (int i = 0; i < numPages; i++) {
         pageTable[i].virtualPage = i;   // for now, virt page # = phys page #
-        pageTable[i].physicalPage = -1; 
-        pageTable[i].valid = FALSE;
+        pageTable[i].physicalPage = i + mark;
+        pageTable[i].valid = TRUE;
         pageTable[i].use = FALSE;
         pageTable[i].dirty = FALSE;
         pageTable[i].readOnly = FALSE;  
-        if (noffH.code.size > 0) {
-            char *buf = new char[PageSize];
-            executable->ReadAt(buf, PageSize, noffH.code.inFileAddr + (PageSize * i));
-            swapFile->WriteAt(buf, PageSize, PageSize * i);
-        }
-       
-        
     }
     
     // zero out the entire address space
-    //bzero(&kernel->machine->mainMemory[pos * PageSize], size);
+    bzero(&kernel->machine->mainMemory[mark * PageSize], size);
 
 // then, copy in the code and data segments into memory
 // Note: this code assumes that virtual address = physical address
-//     if (noffH.code.size > 0) {
-   
+    if (noffH.code.size > 0) {
+        DEBUG(dbgAddr, "Initializing code segment.");
+	DEBUG(dbgAddr, noffH.code.virtualAddr << ", " << noffH.code.size);
+        executable->ReadAt(
+		&(kernel->machine->mainMemory[noffH.code.virtualAddr + mark * PageSize]), 
+			noffH.code.size, noffH.code.inFileAddr);
+    }
+    if (noffH.initData.size > 0) {
+        DEBUG(dbgAddr, "Initializing data segment.");
+	DEBUG(dbgAddr, noffH.initData.virtualAddr << ", " << noffH.initData.size);
+        executable->ReadAt(
+		&(kernel->machine->mainMemory[noffH.initData.virtualAddr + mark * PageSize]),
+			noffH.initData.size, noffH.initData.inFileAddr);
+    }
 
-//         DEBUG(dbgAddr, "Initializing code segment.");
-// 	    DEBUG(dbgAddr, noffH.code.virtualAddr << ", " << noffH.code.size);
-//         executable->ReadAt(
-// 		&(kernel->machine->mainMemory[noffH.code.virtualAddr + pos * PageSize]), 
-// 			noffH.code.size, noffH.code.inFileAddr);
-//     }
-//     if (noffH.initData.size > 0) {
-//         DEBUG(dbgAddr, "Initializing data segment.");
-// 	DEBUG(dbgAddr, noffH.initData.virtualAddr << ", " << noffH.initData.size);
-//         executable->ReadAt(
-// 		&(kernel->machine->mainMemory[noffH.initData.virtualAddr + pos * PageSize]),
-// 			noffH.initData.size, noffH.initData.inFileAddr);
-//     }
+#ifdef RDATA
+    if (noffH.readonlyData.size > 0) {
+        DEBUG(dbgAddr, "Initializing read only data segment.");
+	DEBUG(dbgAddr, noffH.readonlyData.virtualAddr << ", " << noffH.readonlyData.size);
+        executable->ReadAt(
+		&(kernel->machine->mainMemory[noffH.readonlyData.virtualAddr + mark * PageSize]),
+			noffH.readonlyData.size, noffH.readonlyData.inFileAddr);
+    }
+#endif
 
-// #ifdef RDATA
-//     if (noffH.readonlyData.size > 0) {
-
-//         DEBUG(dbgAddr, "Initializing read only data segment.");
-// 	    DEBUG(dbgAddr, noffH.readonlyData.virtualAddr << ", " << noffH.readonlyData.size);
-//         executable->ReadAt(
-// 		&(kernel->machine->mainMemory[noffH.readonlyData.virtualAddr + pos * PageSize]),
-// 			noffH.readonlyData.size, noffH.readonlyData.inFileAddr);
-//     }
-// #endif
-
-
+    mark += numPages;
     delete executable;			// close file
     return TRUE;			// success
 }
@@ -261,9 +248,7 @@ AddrSpace::InitRegisters()
 //----------------------------------------------------------------------
 
 void AddrSpace::SaveState() 
-{
-
-}
+{}
 
 //----------------------------------------------------------------------
 // AddrSpace::RestoreState
@@ -330,27 +315,6 @@ AddrSpace::Translate(unsigned int vaddr, unsigned int *paddr, int isReadWrite)
     return NoException;
 }
 
-void AddrSpace::PageFaultHandler() {
-    int vaddr = kernel->machine->ReadRegister(39);
-    int vpn = vaddr / PageSize;
 
-    if (freeMap[pos]==FALSE) {
-        pageTable[vpn].valid = TRUE;
-        pageTable[vpn].physicalPage = pos;
-        freeMap[pos] = TRUE;
-        ptrPageTable[pos] = &pageTable[vpn];
-        swapFile->ReadAt(&(kernel->machine->mainMemory[PageSize*pos] ), PageSize, PageSize * vpn);
-    }
-    else {
-        ptrPageTable[pos]->valid = FALSE;
-        pageTable[vpn].valid = TRUE;
-        pageTable[vpn].physicalPage = pos;
-        ptrPageTable[pos] = &pageTable[vpn];
-        swapFile->ReadAt(&(kernel->machine->mainMemory[PageSize*pos] ), PageSize, PageSize * vpn);
-    }
-    pos++;
-    pos %= NumPhysPages;
-    kernel->stats->numPageFaults++;
-}
 
 

@@ -60,7 +60,7 @@
 //  "which" is the kind of exception.  The list of possible exceptions
 //  is in machine.h.
 //----------------------------------------------------------------------
-string getStringInMem(int addr, char *str) {
+string getStringInMem(int addr) {
   string name;
   int c;
 
@@ -86,9 +86,10 @@ string getStringInMem(int addr, char *str) {
 
 }
 
-void writeInToMen(char *str, int ptr) {
-  for (int i = ptr, j = 0; j < strlen(str); i++, j++) {
-    kernel->machine->WriteMem(i, 1, (int)*(str+j));
+void writeInToMen(string str, int ptr) {
+  for (int i = ptr, j = 0; j < str.length(); i++, j++) {
+    cout << (int)str.at(j) << endl;
+    kernel->machine->WriteMem(i, 1, (int)str.at(j));
   }
 }
 
@@ -100,14 +101,14 @@ ExceptionHandler(ExceptionType which)
   DEBUG(dbgSys, "Received Exception " << which << " type: " << type << "\n");
   
   switch (which) {
-    case PageFaultException:
-    {
-      //cout<<"page fault\n";
-      kernel->currentThread->space->PageFaultHandler();
-      return;
+    // case PageFaultException:
+    // {
+    //   //cout<<"page fault\n";
+    //   kernel->currentThread->space->PageFaultHandler();
+    //   return;
       
-    break;
-    }
+    // break;
+    // }
     case SyscallException:
     {
       switch(type) {
@@ -139,17 +140,19 @@ ExceptionHandler(ExceptionType which)
 
         case SC_SendMessage:
         {
-          cout << "sending message!" << endl;
+          IntStatus oldLevel = kernel->interrupt->SetLevel(IntOff); 
+          kernel->interrupt->SetLevel(IntOff);
+
+          cout << "sending message! called by: " << kernel->currentThread->getName()  << endl;
           int receiverAddr = kernel->machine->ReadRegister(4);
           int msgAddr = kernel->machine->ReadRegister(5);
           int bufferAddr = kernel->machine->ReadRegister(6);
-          char *receiver; 
-          getStringInMem(receiverAddr, receiver);
-          char *message; 
-          getStringInMem(msgAddr, message);
-          char *bufferName; 
-          getStringInMem(bufferAddr, bufferName);
-          char *sender = kernel->currentThread->getName();
+          string receiver = getStringInMem(receiverAddr);
+          string message = getStringInMem(msgAddr);
+          string bufferName = getStringInMem(bufferAddr);
+          string sender = std::string(kernel->currentThread->getName());
+
+          cout << receiver << "--" << message << "--" << bufferName << "--" << sender << endl;
 
           //to do --contains(bufferName)
           if (kernel->isThreadExist(receiver) && kernel->getThread(receiver)->contains(bufferName)) {
@@ -157,7 +160,10 @@ ExceptionHandler(ExceptionType which)
             buffer->setMessage(message);
             buffer->setStatus(true);
 
+            
             kernel->scheduler->ReadyToRun(kernel->getThread(receiver));
+            
+            
           }
 
           else if (kernel->isThreadExist(receiver)) {
@@ -174,24 +180,24 @@ ExceptionHandler(ExceptionType which)
             cout <<"reciver " << receiver << "not exist!" << endl;
           }
 
+          kernel->interrupt->SetLevel(oldLevel);
           break;
         }
 
         case SC_WaitMessage:
         {
-          cout << "waiting message!" << endl;
+          IntStatus oldLevel = kernel->interrupt->SetLevel(IntOff); 
+          kernel->interrupt->SetLevel(IntOff);
+
+          cout << "waiting message! called by: "<< kernel->currentThread->getName() << endl;
           int senderAddr = kernel->machine->ReadRegister(4);
           int msgAddr = kernel->machine->ReadRegister(5);
           int bufferAddr = kernel->machine->ReadRegister(6);
-          char *sender;
-          getStringInMem(senderAddr, sender);
-          cout << sender;
-          char *bufferName; 
-          getStringInMem(bufferAddr, bufferName);
-          cout << bufferName;
-          char *receiver = kernel->currentThread->getName();
+          string sender = getStringInMem(senderAddr);
+          string bufferName = getStringInMem(bufferAddr);
+          string receiver = std::string(kernel->currentThread->getName());
 
-          cout << sender << "-- " << bufferName << "--" << receiver << "--" << endl;
+          
           
           if (kernel->currentThread->contains(bufferName)) {
             MsgBuffer *buffer = kernel->bufferPool->Search(bufferName);
@@ -206,8 +212,11 @@ ExceptionHandler(ExceptionType which)
 
             kernel->currentThread->addBuffer(buffer);
 
-            kernel->currentThread->Sleep(FALSE);
+            cout << "before sleep" << endl;
 
+            kernel->currentThread->Sleep(FALSE);
+            
+            cout << buffer->getMessage() << endl;
             writeInToMen(buffer->getMessage(), msgAddr);
             
           }
@@ -216,32 +225,38 @@ ExceptionHandler(ExceptionType which)
             writeInToMen("message from kerenl, sender dose not exist!", msgAddr);
           }
           kernel->currentThread->removeBuffer(bufferName);
+          kernel->interrupt->SetLevel(oldLevel);
           break;
         }
 
         case SC_SendAnswer: //receiver and sender reverse
         {
+          IntStatus oldLevel = kernel->interrupt->SetLevel(IntOff); 
+          kernel->interrupt->SetLevel(IntOff);
+
+          cout << "sending answer! called by: " << kernel->currentThread->getName()  << endl;
           int resAddr = kernel->machine->ReadRegister(4);
           int ansAddr = kernel->machine->ReadRegister(5);
           int bufferAddr = kernel->machine->ReadRegister(6);
 
-          char *result;
-          getStringInMem(resAddr, result);
-          char *answer; 
-          getStringInMem(ansAddr, answer);
-          char *bufferName;
-          getStringInMem(bufferAddr, bufferName);
+          string result = getStringInMem(resAddr);
+          string answer = getStringInMem(ansAddr);
+          string bufferName = getStringInMem(bufferAddr);
 
           MsgBuffer *buffer = kernel->bufferPool->Search(bufferName);
-          char *sender = buffer->getSender();
-          char *reciver = buffer->getReceiver();
+          string sender = buffer->getSender();
+          string reciver = buffer->getReceiver();
           
           buffer->setAnswer(answer);
           buffer->setResult(result);
 
           if (kernel->isThreadExist(sender) && kernel->getThread(sender)->contains(bufferName)) {
+
             
             kernel->scheduler->ReadyToRun(kernel->getThread(sender));
+            
+            
+            
           }
           else if (kernel->isThreadExist(sender)) {
             ///to do
@@ -250,17 +265,23 @@ ExceptionHandler(ExceptionType which)
           else {
             cout << "error" << endl;
           }
+          kernel->interrupt->SetLevel(oldLevel);
           break;
         }
 
         case SC_WaitAnswer:
         {
+          cout << "waiting answer! called by: " << kernel->currentThread->getName()  << endl;
+          IntStatus oldLevel = kernel->interrupt->SetLevel(IntOff); 
+          kernel->interrupt->SetLevel(IntOff);
+
           int resAddr = kernel->machine->ReadRegister(4);
           int ansAddr = kernel->machine->ReadRegister(5);
           int bufferAddr = kernel->machine->ReadRegister(6);
 
-          char *bufferName;
-          getStringInMem(bufferAddr, bufferName);
+          string bufferName = getStringInMem(bufferAddr);
+
+          cout << "--" << bufferName << endl;
 
           if (kernel->bufferPool->Search(bufferName) == NULL) {
             cout << "error! no buffer exits!" << endl;
@@ -276,7 +297,9 @@ ExceptionHandler(ExceptionType which)
           else if (kernel->isThreadExist(buffer->getReceiver())) {
             kernel->currentThread->addBuffer(buffer);
 
+            
             kernel->currentThread->Sleep(FALSE);
+            
 
             writeInToMen(buffer->getAnswer(), ansAddr);
             writeInToMen(buffer->getResult(), resAddr);
@@ -284,8 +307,10 @@ ExceptionHandler(ExceptionType which)
           else {
             writeInToMen("message from kerenl, receiver dose not exist!", ansAddr);
           }
+
           buffer->setStatus(false);
           kernel->currentThread->removeBuffer(bufferName);
+          kernel->interrupt->SetLevel(oldLevel);
           break;
         }
 

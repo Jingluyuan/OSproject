@@ -6,6 +6,7 @@
 #include <iostream>
 #include "string.h"
 
+using namespace std;
 class MsgBuffer{
 private:
 	string _sender;     	// sender thread's name
