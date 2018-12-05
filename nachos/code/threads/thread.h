@@ -47,7 +47,7 @@
 //---------------------------------------
 #include "list.h"
 #include "messagebuffer.h"
-
+#include "string.h"
 //---------------------------------------
 
 // CPU register state to be saved on context switch.  
@@ -112,8 +112,8 @@ class Thread {
     void SelfTest();		// test whether thread impl is working
 
     bool deliverBuffer(MsgBuffer* msgbuffer); //deliverBuffer from pool to queue
-    bool removeBuffer(char* buffer_id); //remove specific buffer from queue
-    bool contains(char* buffer_id); //whether thread get buffer
+    bool removeBuffer(string buffer_id); //remove specific buffer from queue
+    bool contains(string buffer_id); //whether thread get buffer
     void addBuffer(MsgBuffer* msgbuffer); //add buffer to queue
     //List<MsgBuffer *>* getMsgQueue() {return (MessageQueue);};
   private:
