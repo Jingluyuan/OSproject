@@ -306,6 +306,7 @@ main(int argc, char **argv)
         for (int i = 0; i < idx; i++) {
             Thread *t = new Thread(userProgName[i]);
             t->Fork((VoidFunctionPtr) RunUserProg,userProgName[i]);
+            cout << "forking" << userProgName[i] << endl;
         }
         
     }
@@ -315,6 +316,7 @@ main(int argc, char **argv)
     // other threads on the ready list (started in SelfTest).  
     // We switch to those threads by saying that the "main" thread 
     // is finished, preventing it from returning.
+
     kernel->currentThread->Finish();  
     
     ASSERTNOTREACHED();

@@ -132,7 +132,7 @@ ExceptionHandler(ExceptionType which)
 
         case SC_SendMessage:
         {
-          
+          cout << "sending message!" << endl;
           int receiverAddr = kernel->machine->ReadRegister(4);
           int msgAddr = kernel->machine->ReadRegister(5);
           int bufferAddr = kernel->machine->ReadRegister(6);
@@ -169,6 +169,7 @@ ExceptionHandler(ExceptionType which)
 
         case SC_WaitMessage:
         {
+          cout << "waiting message!" << endl;
           int senderAddr = kernel->machine->ReadRegister(4);
           int msgAddr = kernel->machine->ReadRegister(5);
           int bufferAddr = kernel->machine->ReadRegister(6);
@@ -181,7 +182,7 @@ ExceptionHandler(ExceptionType which)
             writeInToMen(buffer->getMessage(), msgAddr);
           }
           else if (kernel->isThreadExist(sender)) {
-            MsgBuffer *buffer = kernel->bufferPool->FindNextToUse();
+            MsgBuffer *buffer = kernel->bufferPool->FindNextToUse(bufferName);
             buffer->setSender(sender);
             buffer->setReceiver(receiver);
             buffer->setId(bufferName);
