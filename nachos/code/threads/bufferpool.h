@@ -9,7 +9,7 @@ class BufferPool{
 		BufferPool();
 		~BufferPool();
 
-		MsgBuffer* FindNextToUse(); //find next clean buffer
+		MsgBuffer* FindNextToUse(char* buffer_id); //find next clean buffer
 		MsgBuffer* Search(char* buffer_id); //find specific buffer based on buffer id
 		
 		//List<MsgBuffer *> getPool() {return (bufferPool);};
