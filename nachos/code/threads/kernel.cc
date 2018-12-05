@@ -248,16 +248,16 @@ Kernel::NetworkTest() {
 void 
 Kernel::DespatchTheBuffer(MsgBuffer* buffer)
 {
-    string thread_name = buffer.getReceiver();
+    string thread_name = buffer->getReceiver();
      
 
-    ListIterator<Thread *> *iter = new ListIterator(existList);
+    ListIterator<Thread *> *iter = new ListIterator<Thread *>(existList);
     for (; !iter->IsDone(); iter->Next()) 
     {
-        string tmp = iter->item->getName();
+        string tmp = iter->Item()->getName();
         if (tmp == thread_name)
         {
-            iter->item->addBuffer(buffer); 
+            iter->Item()->addBuffer(buffer); 
         }
       
     }
@@ -266,39 +266,39 @@ Kernel::DespatchTheBuffer(MsgBuffer* buffer)
 void 
 Kernel::AddToThreadTable(Thread* thread)
 {
-    existList.Append(thread);
+    existList->Append(thread);
 }
 
 void 
 Kernel::RemoveFromThreadTable(Thread* thread)
 {
-    existList.Remove(thread);
+    existList->Remove(thread);
 }
 
 Thread* 
 Kernel::getThread(char* threadName)
 {
     string thread_name = threadName;
-    ListIterator<Thread *> *iter = new ListIterator(existList);
+    ListIterator<Thread *> *iter = new ListIterator<Thread *>(existList);
     for (; !iter->IsDone(); iter->Next()) 
     {
-        string tmp = iter->item->getName();
+        string tmp = iter->Item()->getName();
         if (tmp == threadName)
         {
-            return iter->item;
+            return iter->Item();
         }
     }
-      
+    return NULL;
 }
 
 bool 
 Kernel::isThreadExist(char* threadName)
 {
     string thread_name = threadName;
-    ListIterator<Thread *> *iter = new ListIterator(existList);
+    ListIterator<Thread *> *iter = new ListIterator<Thread *>(existList);
     for (; !iter->IsDone(); iter->Next()) 
     {
-        string tmp = iter->item->getName();
+        string tmp = iter->Item()->getName();
         if (tmp == threadName)
         {
             return true;
