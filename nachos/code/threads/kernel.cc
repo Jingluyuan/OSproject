@@ -285,9 +285,8 @@ Kernel::RemoveFromThreadTable(Thread* thread)
 }
 
 Thread* 
-Kernel::getThread(char* threadName)
+Kernel::getThread(string threadName)
 {
-    string thread_name = threadName;
     ListIterator<Thread *> *iter = new ListIterator<Thread *>(existList);
     for (; !iter->IsDone(); iter->Next()) 
     {
@@ -301,9 +300,8 @@ Kernel::getThread(char* threadName)
 }
 
 bool 
-Kernel::isThreadExist(char* threadName)
+Kernel::isThreadExist(string threadName)
 {
-    string thread_name = threadName;
     ListIterator<Thread *> *iter = new ListIterator<Thread *>(existList);
     for (; !iter->IsDone(); iter->Next()) 
     {

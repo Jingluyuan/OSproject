@@ -8,13 +8,13 @@
 
 class MsgBuffer{
 private:
-	char* _sender;     	// sender thread's name
-	char* _receiver;	//  resceiver thread's name
-	char* _buffer_id;	//   buffer's identify id
-	char* _message;		//  message input
+	string _sender;     	// sender thread's name
+	string _receiver;	//  resceiver thread's name
+	string _buffer_id;	//   buffer's identify id
+	string _message;		//  message input
 	bool _used;			// the status of the buffer  true means currently being used; false means currently unused
-	char* _result;
-	char* _answer;
+	string _result;
+	string _answer;
 
 
 public:
@@ -22,20 +22,20 @@ public:
 		_used = false; 			// buffer's status is initialized to be false which means not being used by any process
 	}
 
-	char* getSender();
-	void setSender(char* sender);
-	char* getReceiver();
-	void setReceiver(char* receiver);
-	char* getId();
-	void setId(char* id);
-	char* getMessage();
-	void setMessage(char* message);
+	string getSender();
+	void setSender(string sender);
+	string getReceiver();
+	void setReceiver(string receiver);
+	string getId();
+	void setId(string id);
+	string getMessage();
+	void setMessage(string message);
 	bool getStatus();
 	void setStatus(bool status);
-	char* getResult();
-	void setResult(char* result);
-	char* getAnswer();
-	void setAnswer(char* answer);
+	string getResult();
+	void setResult(string result);
+	string getAnswer();
+	void setAnswer(string answer);
 };
 
 

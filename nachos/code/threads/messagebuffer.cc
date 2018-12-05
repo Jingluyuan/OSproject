@@ -3,50 +3,50 @@
 #include "string.h"
 #include "messagebuffer.h"
 
-char*
+string
 MsgBuffer::getSender()
 {
 	return _sender;
 }
 
 void 
-MsgBuffer::setSender(char* sender)
+MsgBuffer::setSender(string sender)
 {
 	_sender = sender;
 }
 	
-char* 
+string 
 MsgBuffer::getReceiver()
 {
 	return _receiver;
 }
 	
 void 
-MsgBuffer::setReceiver(char* receiver)
+MsgBuffer::setReceiver(string receiver)
 {
 	_receiver = receiver;
 }
 	
-char* 
+string 
 MsgBuffer::getId()
 {
 	return _buffer_id;
 }
 	
 void 
-MsgBuffer::setId(char* id)
+MsgBuffer::setId(string id)
 {
 	_buffer_id = id;
 }
 	
-char* 
+string 
 MsgBuffer::getMessage()
 {
 	return _message;
 }
 	
 void 
-MsgBuffer::setMessage(char* message)
+MsgBuffer::setMessage(string message)
 {
 	_message = message;
 }
@@ -63,26 +63,26 @@ MsgBuffer::setStatus(bool status)
 	_used = status;
 }
 
-char*
+string
 MsgBuffer::getResult()
 {
 	return _result;
 }
 
 void
-MsgBuffer::setResult(char* result)
+MsgBuffer::setResult(string result)
 {
 	_result = result;
 }
 
-char*
+string
 MsgBuffer::getAnswer()
 {
 	return _answer;
 }
 
 void
-MsgBuffer::setAnswer(char* answer)
+MsgBuffer::setAnswer(string answer)
 {
 	_answer = answer;
 }
