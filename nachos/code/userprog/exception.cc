@@ -65,10 +65,10 @@ char * getStringInMem(int addr) {
   int c;
 
   while (1) {
-    if (!kernel->machine->ReadMem(base+i,1,&c)) {
-        kernel->machine->ReadMem(base+i,1,&c);
+    if (!kernel->machine->ReadMem(addr,1,&c)) {
+        kernel->machine->ReadMem(addr,1,&c);
     }
-    if ((char)val != '\0') {
+    if ((char)c != '\0') {
       name += char(c);
       addr++;
     }
@@ -80,7 +80,7 @@ char * getStringInMem(int addr) {
 
   std::stringstream out;
   out << name;
-  s = out.str();
+  string s = out.str();
   return (char*)s.c_str();
 }
 
@@ -143,7 +143,7 @@ ExceptionHandler(ExceptionType which)
 
           //to do --contains(bufferName)
           if (kernel->isThreadExist(receiver) && kernel->getThread(receiver)->contains(bufferName)) {
-            MsgBuffer *buffer = kernel->bufferpool->Search(bufferName);
+            MsgBuffer *buffer = kernel->bufferPool->Search(bufferName);
             buffer->setMessage(message);
             buffer->setStatus(true);
 
@@ -177,7 +177,7 @@ ExceptionHandler(ExceptionType which)
           char *receiver = kernel->currentThread->getName();
           
           if (kernel->currentThread->contains(bufferName)) {
-            MsgBuffer *buffer = kernel->bufferpool->Search(bufferName);
+            MsgBuffer *buffer = kernel->bufferPool->Search(bufferName);
             writeInToMen(buffer->getMessage(), msgAddr);
           }
           else if (kernel->isThreadExist(sender)) {
@@ -189,7 +189,7 @@ ExceptionHandler(ExceptionType which)
 
             kernel->currentThread->addBuffer(buffer);
 
-            kernel->currentThread->Sleep();
+            kernel->currentThread->Sleep(FALSE);
 
             writeInToMen(buffer->getMessage(), msgAddr);
             
@@ -212,7 +212,7 @@ ExceptionHandler(ExceptionType which)
           char *answer = getStringInMem(ansAddr);
           char *bufferName = getStringInMem(bufferAddr);
 
-          MsgBuffer *buffer = kernel->bufferpool->Search(bufferName);
+          MsgBuffer *buffer = kernel->bufferPool->Search(bufferName);
           char *sender = buffer->getSender();
           char *reciver = buffer->getReceiver();
           
@@ -241,27 +241,27 @@ ExceptionHandler(ExceptionType which)
 
           char *bufferName = getStringInMem(bufferAddr);
 
-          if (kernel->bufferpool->Search(bufferName) == NULL) {
+          if (kernel->bufferPool->Search(bufferName) == NULL) {
             cout << "error! no buffer exits!" << endl;
             break;
           }
 
-          MsgBuffer *buffer = kernel->bufferpool->Search(bufferName);
+          MsgBuffer *buffer = kernel->bufferPool->Search(bufferName);
           if (kernel->currentThread->contains(bufferName)) {
             
             writeInToMen(buffer->getAnswer(), ansAddr);
             writeInToMen(buffer->getResult(), resAddr);
           }
-          else if (kernel->isThreadExist(receiver)) {
+          else if (kernel->isThreadExist(buffer->getReceiver())) {
             kernel->currentThread->addBuffer(buffer);
 
-            kernel->currentThread->Sleep();
+            kernel->currentThread->Sleep(FALSE);
 
             writeInToMen(buffer->getAnswer(), ansAddr);
             writeInToMen(buffer->getResult(), resAddr);
           }
           else {
-            writeInToMen("message from kerenl, receiver dose not exist!", msgAddr);
+            writeInToMen("message from kerenl, receiver dose not exist!", ansAddr);
           }
           buffer->setStatus(false);
           kernel->currentThread->removeBuffer(bufferName);
