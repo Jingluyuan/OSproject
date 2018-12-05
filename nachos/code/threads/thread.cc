@@ -100,7 +100,7 @@ Thread::Fork(VoidFunctionPtr func, void *arg)
     
     DEBUG(dbgThread, "Forking thread: " << name << " f(a): " << (int) func << " " << arg);
     
-    kernel->AddToThreadTable(kernel->currentThread);//add thread to thread table
+    kernel->AddToThreadTable(this);//add thread to thread table
 
     StackAllocate(func, arg);
 
@@ -184,7 +184,7 @@ Thread::Finish ()
     
     DEBUG(dbgThread, "Finishing thread: " << name);
     
-    kernel->RemoveFromThreadTable(kernel->currentThread);//remove thread from thread table
+    kernel->RemoveFromThreadTable(this);//remove thread from thread table
 
     Sleep(TRUE);				// invokes SWITCH
     // not reached

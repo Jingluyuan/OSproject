@@ -268,6 +268,21 @@ ExceptionHandler(ExceptionType which)
           break;
         }
 
+        case SC_Write:
+        {
+          //printf("Write system call made by %s\n", kernel->currentThread->getName());
+          int base = kernel->machine->ReadRegister(4);
+          int number = kernel->machine->ReadRegister(5);
+          int c;
+          for (int i=0; i<number; i++) {
+              if (!kernel->machine->ReadMem(base+i,1,&c)) {
+                kernel->machine->ReadMem(base+i,1,&c);
+              }
+              cout<<char(c);
+          }
+        break;
+        }
+
         case SC_Exit:
         {
           //printf("Exit system call made by %s\n", kernel->currentThread->getName());

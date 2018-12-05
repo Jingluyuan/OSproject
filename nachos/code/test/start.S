@@ -177,21 +177,33 @@ ThreadJoin:
 	syscall
 	j 	$31
 	.end ThreadJoin
+
+	.globl SendMessage
+	.ent    SendMessage
 SendMessage:
 	addiu $2, $0, SC_SendMessage
 	syscall
 	j 	$31
 	.end SendMessage
+
+	.globl WaitMessage
+	.ent    WaitMessage
 WaitMessage:
 	addiu $2, $0, SC_WaitMessage
 	syscall
 	j 	$31
 	.end WaitMessage
+
+	.globl SendAnswer
+	.ent    SendAnswer
 SendAnswer:
 	addiu $2, $0, SC_SendAnswer
 	syscall
 	j 	$31
 	.end SendAnswer
+
+	.globl WaitAnswer
+	.ent    WaitAnswer
 WaitAnswer:
 	addiu $2, $0, SC_WaitAnswer
 	syscall

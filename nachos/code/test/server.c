@@ -1,22 +1,25 @@
 /*** server.c ***/
 //work as server
 #include "syscall.h"
-#include <iostream>
-#include <string>
+char data[2048];
 
 int main() {
-
-	cout << "Prog server: server started \n"
-	char *msg
-	waitMessage("client", msg, "buffer1");
+	OpenFileId output = ConsoleOutput;
+	char* str = "Prog server: server started \n";
+	char* msg;
+	Write(str, 30, output);
+	
+	WaitMessage("client", msg, "buffer1");
 	if (msg == "SYN J") {
-		sendAnswer("permit", "ACK J+1", "buffer1");
-		sendMessage("client", "SYN K", "buffer2");
 		char *res;
 		char *ans;
+		SendAnswer("permit", "ACK J+1", "buffer1");
+		SendMessage("client", "SYN K", "buffer2");
+		
 		WaitAnswer(res, ans, "buffer2");
 		if (res == "permit" && ans == "ACK K+1") {
-			cout << "Prog server: connection success"
+			str = "Prog server: connection success\n";
+			Write(str, 33, output);
 		}
 	}
 

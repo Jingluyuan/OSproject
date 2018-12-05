@@ -46,7 +46,7 @@
 
 //---------------------------------------
 #include "list.h"
-#include "MessageBuffer.h"
+#include "messagebuffer.h"
 
 //---------------------------------------
 

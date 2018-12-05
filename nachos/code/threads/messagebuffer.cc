@@ -1,7 +1,7 @@
 #include "copyright.h"
 #include <iostream>
 #include "string.h"
-#include "MessageBuffer.h"
+#include "messagebuffer.h"
 
 char*
 MsgBuffer::getSender()

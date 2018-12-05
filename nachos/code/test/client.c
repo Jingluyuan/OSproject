@@ -1,9 +1,9 @@
 /*** client.c ***/
 //work as client
 #include "syscall.h"
-#include <iostream>
-#include <string>
+char data[2048];
 int main() {
+	OpenFileId output = ConsoleOutput;
 	char *res;
 	char *ans;
 	SendMessage("server","SYN J", "buffer1");
@@ -19,7 +19,9 @@ int main() {
 			SendAnswer("permit", "ACK K+1", "buffer2");
 		}
 		else {
-			cout << "connect failed"
+			char* str = "connect failed\n";
+			Write(str, 16, output);
+			
 			Exit(0);
 		}
 	}

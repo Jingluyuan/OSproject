@@ -36,7 +36,7 @@ public:
 	void setResult(char* result);
 	char* getAnswer();
 	void setAnswer(char* answer);
-}
+};
 
 
 #endif

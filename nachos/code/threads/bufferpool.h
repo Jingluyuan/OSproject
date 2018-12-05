@@ -19,7 +19,7 @@ class BufferPool{
 
 		//int size;
 
-}
+};
 
 
 #endif
