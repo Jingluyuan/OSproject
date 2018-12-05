@@ -272,7 +272,16 @@ Kernel::AddToThreadTable(Thread* thread)
 void 
 Kernel::RemoveFromThreadTable(Thread* thread)
 {
-    existList->Remove(thread);
+    string target = thread->getName();
+    for(int i = 0; i < existList->NumInList(); i++){
+        Thread* tmp = existList->RemoveFront();
+        string temp = tmp->getName();
+        if(target.compare(temp) == 0){
+            return;
+        }
+        MessageQueue->Append(mb);
+    }
+    
 }
 
 Thread* 
