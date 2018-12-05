@@ -3,7 +3,7 @@
 #include "string.h"
 
 BufferPool::BufferPool(){
-	bufferPool = new List<MsgBuffer>;
+	bufferPool = new List<MsgBuffer*>;
 //initialize 20 buffers 
 	for(int i = 0; i < 20; i++){
 		MsgBuffer *mb = new MsgBuffer();
@@ -26,7 +26,7 @@ BufferPool::FindNextToUse(){
 	for(int i = 0; i < bufferPool->NumInList(); i++){
 		MsgBuffer* mb = bufferPool->RemoveFront();
 		bufferPool->Append(mb);
-		if(!mb->getStatus){
+		if(!mb->getStatus()){
 			return mb;
 		}
 	}
