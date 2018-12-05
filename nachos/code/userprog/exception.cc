@@ -88,7 +88,6 @@ string getStringInMem(int addr) {
 
 void writeInToMen(string str, int ptr) {
   for (int i = ptr, j = 0; j < str.length(); i++, j++) {
-    cout << (int)str.at(j) << endl;
     kernel->machine->WriteMem(i, 1, (int)str.at(j));
   }
 }
@@ -152,18 +151,17 @@ ExceptionHandler(ExceptionType which)
           string bufferName = getStringInMem(bufferAddr);
           string sender = std::string(kernel->currentThread->getName());
 
-          cout << receiver << "--" << message << "--" << bufferName << "--" << sender << endl;
+          cout << "sender: " << sender << " receiver: " << receiver << " message: " << message << " bufferName: " << bufferName << endl;
 
-          //to do --contains(bufferName)
+
           if (kernel->isThreadExist(receiver) && kernel->getThread(receiver)->contains(bufferName)) {
             MsgBuffer *buffer = kernel->bufferPool->Search(bufferName);
             buffer->setMessage(message);
             buffer->setStatus(true);
+            cout << " receiver: " << receiver << " is waiting for message in buffer: " << bufferName << " acitve receiver" << endl;
 
-            
             kernel->scheduler->ReadyToRun(kernel->getThread(receiver));
-            
-            
+                        
           }
 
           else if (kernel->isThreadExist(receiver)) {
@@ -173,7 +171,8 @@ ExceptionHandler(ExceptionType which)
             buffer->setId(bufferName);
             buffer->setMessage(message);
             buffer->setStatus(true);
-            ///to do
+            
+            cout << "delivers buffer: " << bufferName << " to receiver: " << receiver << endl;
             kernel->getThread(receiver)->addBuffer(buffer);
           }
           else {
@@ -197,10 +196,11 @@ ExceptionHandler(ExceptionType which)
           string bufferName = getStringInMem(bufferAddr);
           string receiver = std::string(kernel->currentThread->getName());
 
-          
+          cout << "sender: " << sender << " receiver: " << receiver << " bufferName: " << bufferName << endl;
           
           if (kernel->currentThread->contains(bufferName)) {
             MsgBuffer *buffer = kernel->bufferPool->Search(bufferName);
+            cout << "buffer: " << bufferName << " has already in queue, message: " << buffer->getMessage() << " from sender: " << sender << endl;
             writeInToMen(buffer->getMessage(), msgAddr);
           }
           else if (kernel->isThreadExist(sender)) {
@@ -212,18 +212,21 @@ ExceptionHandler(ExceptionType which)
 
             kernel->currentThread->addBuffer(buffer);
 
-            cout << "before sleep" << endl;
+            cout << "buffer: " << bufferName << " not yet received from sender: " << sender << " ,delay until this message arrives" << endl;
 
             kernel->currentThread->Sleep(FALSE);
-            
-            cout << buffer->getMessage() << endl;
+
+            cout << "message: " << buffer->getMessage() << " from sender: " << sender << "in buffer : " << bufferName << " arrived" << endl;
+ 
             writeInToMen(buffer->getMessage(), msgAddr);
             
           }
           else {
-            cout << "sender: " << sender << " dose not exist!" << endl;
+            cout << "sender: " << sender << " dose not exist! write a dummy message back" << endl;
             writeInToMen("message from kerenl, sender dose not exist!", msgAddr);
+            break;
           }
+          cout << "remove buffer: " << bufferName << " from queue" << endl;
           kernel->currentThread->removeBuffer(bufferName);
           kernel->interrupt->SetLevel(oldLevel);
           break;
@@ -245,25 +248,30 @@ ExceptionHandler(ExceptionType which)
 
           MsgBuffer *buffer = kernel->bufferPool->Search(bufferName);
           string sender = buffer->getSender();
-          string reciver = buffer->getReceiver();
+          string receiver = buffer->getReceiver();
           
           buffer->setAnswer(answer);
           buffer->setResult(result);
 
-          if (kernel->isThreadExist(sender) && kernel->getThread(sender)->contains(bufferName)) {
+          cout << receiver << " send back result: " << result << " ,and answer: " << answer << " to " << sender << " ,using bufferName: " << bufferName << endl;
 
+          if (kernel->bufferPool->Search(bufferName) == NULL) {
+            cout << "error! no buffer exits!" << endl;
+            break;
+          }
+
+          if (kernel->isThreadExist(sender) && kernel->getThread(sender)->contains(bufferName)) {
             
+            cout << sender << " is waiting for answer in buffer: " << bufferName << " acitve original sender" << endl;
             kernel->scheduler->ReadyToRun(kernel->getThread(sender));
-            
-            
-            
+
           }
           else if (kernel->isThreadExist(sender)) {
-            ///to do
+            cout << receiver << "delivers answer in buffer: " << bufferName << " to original sender: " << sender << endl;
             kernel->getThread(sender)->addBuffer(buffer);
           }
           else {
-            cout << "error" << endl;
+            cout << "error, original sender dose not exist" << endl;
           }
           kernel->interrupt->SetLevel(oldLevel);
           break;
@@ -281,7 +289,6 @@ ExceptionHandler(ExceptionType which)
 
           string bufferName = getStringInMem(bufferAddr);
 
-          cout << "--" << bufferName << endl;
 
           if (kernel->bufferPool->Search(bufferName) == NULL) {
             cout << "error! no buffer exits!" << endl;
@@ -290,26 +297,30 @@ ExceptionHandler(ExceptionType which)
 
           MsgBuffer *buffer = kernel->bufferPool->Search(bufferName);
           if (kernel->currentThread->contains(bufferName)) {
-            
+            cout << "buffer: " << bufferName << " has already in queue, result: " << buffer->getResult() 
+                      << " ,answer: " << buffer->getAnswer() << endl;
             writeInToMen(buffer->getAnswer(), ansAddr);
             writeInToMen(buffer->getResult(), resAddr);
           }
           else if (kernel->isThreadExist(buffer->getReceiver())) {
             kernel->currentThread->addBuffer(buffer);
 
-            
+            cout << "buffer: " << bufferName << " not yet received, delay until this buffer arrives" << endl;
             kernel->currentThread->Sleep(FALSE);
             
-
+            cout << "buffer: " << bufferName << " received, result: " << buffer->getResult() 
+                      << " ,answer: " << buffer->getAnswer() << endl;
             writeInToMen(buffer->getAnswer(), ansAddr);
             writeInToMen(buffer->getResult(), resAddr);
           }
           else {
+            cout << "origin receiver: " << buffer->getReceiver() << " dose not exist! write a dummy message back" << endl;
             writeInToMen("message from kerenl, receiver dose not exist!", ansAddr);
           }
 
           buffer->setStatus(false);
           kernel->currentThread->removeBuffer(bufferName);
+          cout << "remove buffer: " << bufferName << " from queue" << endl;
           kernel->interrupt->SetLevel(oldLevel);
           break;
         }

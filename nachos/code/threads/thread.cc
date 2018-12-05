@@ -101,7 +101,7 @@ Thread::Fork(VoidFunctionPtr func, void *arg)
     DEBUG(dbgThread, "Forking thread: " << name << " f(a): " << (int) func << " " << arg);
     
     kernel->AddToThreadTable(this);//add thread to thread table
-    cout << "adding thread to table" << this->getName() << endl;
+    //cout << "adding thread to table" << this->getName() << endl;
 
     StackAllocate(func, arg);
 
