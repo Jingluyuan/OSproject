@@ -469,13 +469,13 @@ Thread::SelfTest()
 //----------------------------------------------------------------------
 
  bool 
- Thread::removeBuffer(char* buffer_id)
+ Thread::removeBuffer(string buffer_id)
  {
-    string target = buffer_id;
+    
     for(int i = 0; i < MessageQueue->NumInList(); i++){
         MsgBuffer* mb = MessageQueue->RemoveFront();
         string temp = mb->getId();
-        if(target.compare(temp) == 0){
+        if(buffer_id.compare(temp) == 0){
             return true;
         }
         MessageQueue->Append(mb);
@@ -490,14 +490,14 @@ Thread::SelfTest()
 //----------------------------------------------------------------------
 
  bool 
- Thread::contains(char* buffer_id)
+ Thread::contains(string buffer_id)
  {  
-    string target = buffer_id;
+    
     for(int i = 0; i < MessageQueue->NumInList(); i++){
         MsgBuffer* mb = MessageQueue->RemoveFront();
         string temp = mb->getId();
         MessageQueue->Append(mb);
-        if(target.compare(temp) == 0){
+        if(buffer_id.compare(temp) == 0){
             return true;
         }
     }

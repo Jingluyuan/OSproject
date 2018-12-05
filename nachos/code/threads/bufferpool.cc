@@ -24,7 +24,7 @@ BufferPool::~BufferPool(){
 //----------------------------------------------------------------------
 
 MsgBuffer*
-BufferPool::FindNextToUse(char* buffer_id){
+BufferPool::FindNextToUse(string buffer_id){
 	for(int i = 0; i < bufferPool->NumInList(); i++){
 		MsgBuffer* mb = bufferPool->RemoveFront();
 		bufferPool->Append(mb);
@@ -46,13 +46,13 @@ BufferPool::FindNextToUse(char* buffer_id){
 //----------------------------------------------------------------------
 
 MsgBuffer*
-BufferPool::Search(char* buffer_id){
-	string target = buffer_id;
+BufferPool::Search(string buffer_id){
+	
 	for(int i = 0; i < bufferPool->NumInList(); i++){
 		MsgBuffer* mb = bufferPool->RemoveFront();
 		string temp = mb->getId();
 		bufferPool->Append(mb);
-		if(target.compare(temp) == 0){
+		if(buffer_id.compare(temp) == 0){
 			return mb;
 		}
 	}
