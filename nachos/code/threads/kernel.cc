@@ -279,7 +279,7 @@ Kernel::RemoveFromThreadTable(Thread* thread)
         if(target.compare(temp) == 0){
             return;
         }
-        MessageQueue->Append(mb);
+        existList->Append(tmp);
     }
     
 }

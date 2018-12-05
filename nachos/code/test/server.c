@@ -7,6 +7,7 @@ int main() {
 	OpenFileId output = ConsoleOutput;
 	char* str = "Prog server: server started \n";
 	char* msg;
+	ThreadYield();
 	Write(str, 30, output);
 	
 	WaitMessage("client", msg, "buffer1");

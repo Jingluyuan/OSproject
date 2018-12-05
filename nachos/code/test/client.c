@@ -6,6 +6,7 @@ int main() {
 	OpenFileId output = ConsoleOutput;
 	char *res;
 	char *ans;
+	ThreadYield();
 	SendMessage("server","SYN J", "buffer1");
 	WaitAnswer(res, ans, "buffer1");
 	if (res != "permit") {

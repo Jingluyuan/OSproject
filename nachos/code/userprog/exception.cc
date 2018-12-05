@@ -60,7 +60,7 @@
 //  "which" is the kind of exception.  The list of possible exceptions
 //  is in machine.h.
 //----------------------------------------------------------------------
-char * getStringInMem(int addr) {
+string getStringInMem(int addr, char *str) {
   string name;
   int c;
 
@@ -81,7 +81,9 @@ char * getStringInMem(int addr) {
   std::stringstream out;
   out << name;
   string s = out.str();
-  return (char*)s.c_str();
+
+  return s;
+
 }
 
 void writeInToMen(char *str, int ptr) {
@@ -130,15 +132,23 @@ ExceptionHandler(ExceptionType which)
           
           break;
 
+        case SC_ThreadYield: {
+          kernel->currentThread->Yield();
+          break;
+        }
+
         case SC_SendMessage:
         {
           cout << "sending message!" << endl;
           int receiverAddr = kernel->machine->ReadRegister(4);
           int msgAddr = kernel->machine->ReadRegister(5);
           int bufferAddr = kernel->machine->ReadRegister(6);
-          char *receiver = getStringInMem(receiverAddr);
-          char *message = getStringInMem(msgAddr);
-          char *bufferName = getStringInMem(bufferAddr);
+          char *receiver; 
+          getStringInMem(receiverAddr, receiver);
+          char *message; 
+          getStringInMem(msgAddr, message);
+          char *bufferName; 
+          getStringInMem(bufferAddr, bufferName);
           char *sender = kernel->currentThread->getName();
 
           //to do --contains(bufferName)
@@ -173,9 +183,15 @@ ExceptionHandler(ExceptionType which)
           int senderAddr = kernel->machine->ReadRegister(4);
           int msgAddr = kernel->machine->ReadRegister(5);
           int bufferAddr = kernel->machine->ReadRegister(6);
-          char *sender = getStringInMem(senderAddr);
-          char *bufferName = getStringInMem(bufferAddr);
+          char *sender;
+          getStringInMem(senderAddr, sender);
+          cout << sender;
+          char *bufferName; 
+          getStringInMem(bufferAddr, bufferName);
+          cout << bufferName;
           char *receiver = kernel->currentThread->getName();
+
+          cout << sender << "-- " << bufferName << "--" << receiver << "--" << endl;
           
           if (kernel->currentThread->contains(bufferName)) {
             MsgBuffer *buffer = kernel->bufferPool->Search(bufferName);
@@ -209,9 +225,12 @@ ExceptionHandler(ExceptionType which)
           int ansAddr = kernel->machine->ReadRegister(5);
           int bufferAddr = kernel->machine->ReadRegister(6);
 
-          char *result = getStringInMem(resAddr);
-          char *answer = getStringInMem(ansAddr);
-          char *bufferName = getStringInMem(bufferAddr);
+          char *result;
+          getStringInMem(resAddr, result);
+          char *answer; 
+          getStringInMem(ansAddr, answer);
+          char *bufferName;
+          getStringInMem(bufferAddr, bufferName);
 
           MsgBuffer *buffer = kernel->bufferPool->Search(bufferName);
           char *sender = buffer->getSender();
@@ -240,7 +259,8 @@ ExceptionHandler(ExceptionType which)
           int ansAddr = kernel->machine->ReadRegister(5);
           int bufferAddr = kernel->machine->ReadRegister(6);
 
-          char *bufferName = getStringInMem(bufferAddr);
+          char *bufferName;
+          getStringInMem(bufferAddr, bufferName);
 
           if (kernel->bufferPool->Search(bufferName) == NULL) {
             cout << "error! no buffer exits!" << endl;
