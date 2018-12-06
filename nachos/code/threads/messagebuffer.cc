@@ -86,3 +86,15 @@ MsgBuffer::setAnswer(string answer)
 {
 	_answer = answer;
 }
+
+BufferStatus 
+MsgBuffer::getUsingStatus()
+{
+	return _using_status;
+}
+void 
+setUsingStatus(BufferStatus bufferStatus)
+{
+	_using_status = bufferStatus;
+}
+
