@@ -8,7 +8,7 @@
 
 using namespace std;
 
-enum BufferStatus {JUST_CREATED,SEND_MESSAGE,WAIT_MESSAGE,SEND_ANSWER,WAIT_ANSWER};
+enum BufferStatus {CREATED,SEND_MESSAGE,WAIT_MESSAGE,SEND_ANSWER,WAIT_ANSWER};
 class MsgBuffer{
 private:
 	string _sender;     	// sender thread's name

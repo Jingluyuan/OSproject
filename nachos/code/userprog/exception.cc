@@ -154,7 +154,7 @@ ExceptionHandler(ExceptionType which)
 
           cout << "sender: " << sender << " ,receiver: " << receiver << " .message: " << message << " .bufferName: " << bufferName << endl;
 
-          if (kernel->bufferpool->reachLimit()) {
+          if (kernel->bufferPool->reachLimit()) {
             cout << "over bufferPool's limit" << endl;
             break;
           }
@@ -164,10 +164,11 @@ ExceptionHandler(ExceptionType which)
             break;
           }
 
-          if (kernel->isThreadExist(receiver) && kernel->getThread(receiver)->contains(bufferName)) {
+          if (kernel->isThreadExist(receiver) && kernel->bufferPool->Search(bufferName) != NULL) {
             MsgBuffer *buffer = kernel->bufferPool->Search(bufferName);
             buffer->setMessage(message);
             buffer->setStatus(true);
+            buffer->setUsingStatus(SEND_MESSAGE);
             cout << " receiver: " << receiver << " is waiting for message in buffer: " << bufferName << " ,acitve receiver" << endl;
 
             kernel->scheduler->ReadyToRun(kernel->getThread(receiver));
@@ -181,6 +182,7 @@ ExceptionHandler(ExceptionType which)
             buffer->setId(bufferName);
             buffer->setMessage(message);
             buffer->setStatus(true);
+            buffer->setUsingStatus(SEND_MESSAGE);
             
             cout << "delivers buffer: " << bufferName << " to receiver: " << receiver << endl;
             kernel->getThread(receiver)->addBuffer(buffer);
@@ -212,9 +214,11 @@ ExceptionHandler(ExceptionType which)
             MsgBuffer *buffer = kernel->bufferPool->Search(bufferName);
             cout << "buffer: " << bufferName << " has already in queue, message: " << buffer->getMessage() << " ,from sender: " << sender << endl;
             writeInToMen(buffer->getMessage(), msgAddr);
+            cout << "remove buffer: " << bufferName << " from queue" << endl;
+            kernel->currentThread->removeBuffer(bufferName);
           }
           else if (kernel->isThreadExist(sender)) {
-            if (kernel->bufferpool->reachLimit()) {
+            if (kernel->bufferPool->reachLimit()) {
               cout << "over bufferPool's limit" << endl;
               break;
             }
@@ -229,8 +233,9 @@ ExceptionHandler(ExceptionType which)
             buffer->setReceiver(receiver);
             buffer->setId(bufferName);
             buffer->setStatus(true);
+            buffer->setUsingStatus(WAIT_MESSAGE);
 
-            kernel->currentThread->addBuffer(buffer);
+            //kernel->currentThread->addBuffer(buffer);
 
             cout << "buffer: " << bufferName << " not yet received from sender: " << sender << " ,delay until this message arrives" << endl;
 
@@ -246,8 +251,7 @@ ExceptionHandler(ExceptionType which)
             writeInToMen("message from kerenl, sender dose not exist!", msgAddr);
             break;
           }
-          cout << "remove buffer: " << bufferName << " from queue" << endl;
-          kernel->currentThread->removeBuffer(bufferName);
+          
           kernel->interrupt->SetLevel(oldLevel);
           break;
         }
@@ -270,8 +274,7 @@ ExceptionHandler(ExceptionType which)
           string sender = buffer->getSender();
           string receiver = buffer->getReceiver();
           
-          buffer->setAnswer(answer);
-          buffer->setResult(result);
+          
 
           cout << receiver << " send back result: " << result << " ,and answer: " << answer << " ,to " << sender << " ,using buffer: " << bufferName << endl;
 
@@ -280,7 +283,11 @@ ExceptionHandler(ExceptionType which)
             break;
           }
 
-          if (kernel->isThreadExist(sender) && kernel->getThread(sender)->contains(bufferName)) {
+          buffer->setAnswer(answer);
+          buffer->setResult(result);
+          buffer->setUsingStatus(SEND_ANSWER);
+
+          if (kernel->isThreadExist(sender) && kernel->bufferPool->Search(bufferName) != NULL) {
             
             cout << sender << " is waiting for answer in buffer: " << bufferName << " ,acitve original sender" << endl;
             kernel->scheduler->ReadyToRun(kernel->getThread(sender));
@@ -325,15 +332,18 @@ ExceptionHandler(ExceptionType which)
                       << " ,answer: " << buffer->getAnswer() << endl;
             writeInToMen(buffer->getAnswer(), ansAddr);
             writeInToMen(buffer->getResult(), resAddr);
+            kernel->currentThread->removeBuffer(bufferName);
+            cout << "remove buffer: " << bufferName << " from queue" << endl;
           }
           else if (kernel->isThreadExist(buffer->getReceiver())) {
             if (kernel->getThread(buffer->getSender())->reachLimit()) {
               cout << "over sender: "<< buffer->getSender() << "\'s queue limitation" << endl;
               break;
             }
-            kernel->currentThread->addBuffer(buffer);
+            //kernel->currentThread->addBuffer(buffer);
 
             cout << "buffer: " << bufferName << " not yet received, delay until this buffer arrives" << endl;
+            buffer->setUsingStatus(WAIT_ANSWER);
             kernel->currentThread->Sleep(FALSE);
             
             cout << "buffer: " << bufferName << " received, result: " << buffer->getResult() 
@@ -347,8 +357,7 @@ ExceptionHandler(ExceptionType which)
           }
 
           buffer->setStatus(false);
-          kernel->currentThread->removeBuffer(bufferName);
-          cout << "remove buffer: " << bufferName << " from queue" << endl;
+          
           kernel->interrupt->SetLevel(oldLevel);
           break;
         }

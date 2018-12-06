@@ -5,8 +5,8 @@
 // In this situation, buffer pool won't be enough for the total WaitMessage system calls which will be returned an error message
 int main() {
 	OpenFileId output = ConsoleOutput;
-	ThreadYield();
 	char* msg;
+	ThreadYield();
 	WaitMessage("uprog3_client", msg, "buffer1");
 	WaitMessage("uprog3_client", msg, "buffer2");
 	WaitMessage("uprog3_client", msg, "buffer3");

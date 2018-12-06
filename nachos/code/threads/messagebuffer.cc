@@ -93,7 +93,7 @@ MsgBuffer::getUsingStatus()
 	return _using_status;
 }
 void 
-setUsingStatus(BufferStatus bufferStatus)
+MsgBuffer::setUsingStatus(BufferStatus bufferStatus)
 {
 	_using_status = bufferStatus;
 }
