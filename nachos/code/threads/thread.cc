@@ -515,3 +515,20 @@ Thread::SelfTest()
  {
     MessageQueue->Append(msgbuffer);
  }
+
+
+//----------------------------------------------------------------------
+//  Thread::reachLimit
+//  Determine whether thread queue is full 
+//  TRUE is full, FALSE on the contary
+//----------------------------------------------------------------------
+ bool
+Thread::reachLimit(){
+    int size;
+    size = MessageQueue->NumInList();
+    if(size >= 10){
+        return TRUE;
+    }else{
+        return FALSE;
+    }
+ }

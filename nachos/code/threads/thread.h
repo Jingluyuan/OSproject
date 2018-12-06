@@ -115,6 +115,7 @@ class Thread {
     bool removeBuffer(string buffer_id); //remove specific buffer from queue
     bool contains(string buffer_id); //whether thread get buffer
     void addBuffer(MsgBuffer* msgbuffer); //add buffer to queue
+    bool reachLimit();
     //List<MsgBuffer *>* getMsgQueue() {return (MessageQueue);};
   private:
     // some of the private data for this class is listed above

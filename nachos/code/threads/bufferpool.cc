@@ -59,3 +59,18 @@ BufferPool::Search(string buffer_id){
 	return NULL;
 }
 
+//----------------------------------------------------------------------
+//  Thread::reachLimit
+//  Determine whether thread bufferpool is full 
+//  TRUE is full, FALSE on the contary
+//----------------------------------------------------------------------
+ bool
+BufferPool::reachLimit(){
+    int size;
+    size = bufferPool->NumInList();
+    if(size >= 20){
+        return TRUE;
+    }else{
+        return FALSE;
+    }
+ }
