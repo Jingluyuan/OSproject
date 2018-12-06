@@ -12,6 +12,8 @@ class BufferPool{
 
 		MsgBuffer* FindNextToUse(string buffer_id); //find next clean buffer
 		MsgBuffer* Search(string buffer_id); //find specific buffer based on buffer id
+		MsgBuffer* SearchBySender(string sender_id);
+		MsgBuffer* SearchByReceiver(string receiver_id);
 		bool reachLimit();
 		//List<MsgBuffer *> getPool() {return (bufferPool);};
 

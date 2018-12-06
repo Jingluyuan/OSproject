@@ -74,3 +74,34 @@ BufferPool::reachLimit(){
         return FALSE;
     }
  }
+
+
+
+MsgBuffer*
+BufferPool::SearchBySender(string sender_id){
+	
+	for(int i = 0; i < bufferPool->NumInList(); i++){
+		MsgBuffer* mb = bufferPool->RemoveFront();
+		string temp = mb->getSender();
+		bufferPool->Append(mb);
+		if(sender_id.compare(temp) == 0){
+			return mb;
+		}
+	}
+	return NULL;
+}
+
+
+MsgBuffer*
+BufferPool::SearchByReceiver(string receiver_id){
+	
+	for(int i = 0; i < bufferPool->NumInList(); i++){
+		MsgBuffer* mb = bufferPool->RemoveFront();
+		string temp = mb->getSender();
+		bufferPool->Append(mb);
+		if(receiver_id.compare(temp) == 0){
+			return mb;
+		}
+	}
+	return NULL;
+}
