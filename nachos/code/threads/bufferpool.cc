@@ -92,7 +92,7 @@ BufferPool::SearchBySender(string sender_id){
 		MsgBuffer* mb = bufferPool->RemoveFront();
 		string temp = mb->getSender();
 		bufferPool->Append(mb);
-		if(sender_id.compare(temp) == 0){
+		if(sender_id.compare(temp) == 0 && mb->getUsingStatus() == WAIT_MESSAGE){
 			return mb;
 		}
 	}
@@ -107,7 +107,7 @@ BufferPool::SearchByReceiver(string receiver_id){
 		MsgBuffer* mb = bufferPool->RemoveFront();
 		string temp = mb->getSender();
 		bufferPool->Append(mb);
-		if(receiver_id.compare(temp) == 0){
+		if(receiver_id.compare(temp) == 0 && mb->getUsingStatus() == WAIT_ANSWER){
 			return mb;
 		}
 	}
