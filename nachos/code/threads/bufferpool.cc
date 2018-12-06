@@ -67,12 +67,20 @@ BufferPool::Search(string buffer_id){
  bool
 BufferPool::reachLimit(){
     int size;
-    size = bufferPool->NumInList();
-    if(size >= 20){
-        return TRUE;
-    }else{
-        return FALSE;
-    }
+    size = 0;
+  	for(int i = 0; i < bufferPool->NumInList(); i++){
+		MsgBuffer* mb = bufferPool->RemoveFront();
+		bufferPool->Append(mb);
+		if(mb->getStatus()){
+			size++;
+		}
+	}
+
+	if(size >= 20){
+		return TRUE;
+	}else{
+		return FALSE;
+	}
  }
 
 
