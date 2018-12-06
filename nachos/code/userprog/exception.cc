@@ -188,7 +188,7 @@ ExceptionHandler(ExceptionType which)
             kernel->getThread(receiver)->addBuffer(buffer);
           }
           else {
-            cout <<"reciver " << receiver << "not exist!" << endl;
+            cout <<"reciver " << receiver << " not exist!" << endl;
           }
 
           kernel->interrupt->SetLevel(oldLevel);
@@ -241,7 +241,10 @@ ExceptionHandler(ExceptionType which)
 
             kernel->currentThread->Sleep(FALSE);
 
-            cout << "message: " << buffer->getMessage() << " ,from sender: " << sender << " ,in buffer : " << bufferName << " arrived" << endl;
+            if (buffer->getMessage().compare("dummy message") == 0)
+              cout << "dummy message from system, due to waiting sender terminates" << endl;
+            else 
+              cout << "message: " << buffer->getMessage() << " ,from sender: " << sender << " ,in buffer : " << bufferName << " arrived" << endl;
  
             writeInToMen(buffer->getMessage(), msgAddr);
             
@@ -310,9 +313,11 @@ ExceptionHandler(ExceptionType which)
 
         case SC_WaitAnswer:
         {
-          cout << "---------Sys call waiting answer called by: " << kernel->currentThread->getName() << "-----------"  << endl;
           IntStatus oldLevel = kernel->interrupt->SetLevel(IntOff); 
           kernel->interrupt->SetLevel(IntOff);
+
+          cout << "---------Sys call waiting answer called by: " << kernel->currentThread->getName() << "-----------"  << endl;
+          
 
           int resAddr = kernel->machine->ReadRegister(4);
           int ansAddr = kernel->machine->ReadRegister(5);
@@ -346,7 +351,10 @@ ExceptionHandler(ExceptionType which)
             buffer->setUsingStatus(WAIT_ANSWER);
             kernel->currentThread->Sleep(FALSE);
             
-            cout << "buffer: " << bufferName << " received, result: " << buffer->getResult() 
+            if (buffer->getMessage().compare("dummy message") == 0)
+              cout << "dummy answer from system, due to waiting sender terminates" << endl;
+            else 
+              cout << "buffer: " << bufferName << " received, result: " << buffer->getResult() 
                       << " ,answer: " << buffer->getAnswer() << endl;
             writeInToMen(buffer->getAnswer(), ansAddr);
             writeInToMen(buffer->getResult(), resAddr);
@@ -379,10 +387,39 @@ ExceptionHandler(ExceptionType which)
 
         case SC_Exit:
         {
-          cout << "---------Sys call exit called by: " << kernel->currentThread->getName() << "-----------"  << endl;
+          IntStatus oldLevel = kernel->interrupt->SetLevel(IntOff); 
+          kernel->interrupt->SetLevel(IntOff);
 
+          cout << "---------Sys call exit called by: " << kernel->currentThread->getName() << "-----------"  << endl;
+          string sender = std::string(kernel->currentThread->getName());
+          
+          MsgBuffer* buffer = kernel->bufferPool->SearchBySender(sender);
+
+          while (buffer != NULL) {
+            
+            string receiverTmp = buffer->getReceiver();
+            buffer->setMessage("dummy message");
+            buffer->setUsingStatus(SEND_MESSAGE);
+            cout << "sending dummy message to receiver: " << receiverTmp << endl;
+            kernel->scheduler->ReadyToRun(kernel->getThread(receiverTmp));
+            
+            buffer = kernel->bufferPool->SearchBySender(sender);
+          }
+
+          string receiver = std::string(kernel->currentThread->getName());
+
+          buffer = kernel->bufferPool->SearchByReceiver(receiver);
+          while (buffer != NULL) {
+            string senderTmp = buffer->getSender();
+            buffer->setAnswer("dummy message");
+            buffer->setUsingStatus(SEND_ANSWER);
+            cout << "sending dummy answer to original sender: " << senderTmp << endl;
+            kernel->scheduler->ReadyToRun(kernel->getThread(senderTmp));
+            buffer = kernel->bufferPool->SearchByReceiver(receiver);
+          }
 
           kernel->currentThread->Finish();
+          kernel->interrupt->SetLevel(oldLevel);
           break;
         } 
         default:

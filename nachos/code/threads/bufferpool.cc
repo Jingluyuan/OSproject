@@ -105,7 +105,7 @@ BufferPool::SearchByReceiver(string receiver_id){
 	
 	for(int i = 0; i < bufferPool->NumInList(); i++){
 		MsgBuffer* mb = bufferPool->RemoveFront();
-		string temp = mb->getSender();
+		string temp = mb->getReceiver();
 		bufferPool->Append(mb);
 		if(receiver_id.compare(temp) == 0 && mb->getUsingStatus() == WAIT_ANSWER){
 			return mb;

@@ -112,11 +112,7 @@ ifeq ($(hosttype),unknown)
 PROGRAMS = unknownhost
 else
 # change this if you create a new test program!
-<<<<<<< Updated upstream
-PROGRAMS = add halt shell matmult sort segments client server uprog1 uprog2_client uprog2_server uprog3_client uprog3_server uprog4
-=======
 PROGRAMS = add halt shell matmult sort segments client server uprog1 uprog2_client uprog2_server uprog3_A  uprog3_B uprog3_C uprog4 uprog5_client uprog5_server1 uprog5_server2 uprog5_server3 uprog6_client uprog6_server uprog7_client uprog7_server
->>>>>>> Stashed changes
 endif
 
 all: $(PROGRAMS)

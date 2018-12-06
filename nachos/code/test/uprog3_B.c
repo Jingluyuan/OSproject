@@ -2,6 +2,7 @@
 
 int main() {
 	OpenFileId output = ConsoleOutput;
+	int i = 0;
 	ThreadYield();
 	SendMessage("uprog3_C","Hello From B by buffer8", "buffer8");
 	SendMessage("uprog3_C","Hello From B by buffer9", "buffer9");
@@ -10,5 +11,8 @@ int main() {
 	SendMessage("uprog3_C","Hello From B by buffer12", "buffer12");
 	SendMessage("uprog3_C","Hello From B by buffer13", "buffer13");
 	SendMessage("uprog3_C","Hello From B by buffer14", "buffer14");
+	while (i++ < 20) {
+		ThreadYield();
+	}
 	Exit(0);
 }
