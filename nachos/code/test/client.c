@@ -8,10 +8,10 @@ int main() {
 	char *ans;
 	char* msg;
 	ThreadYield();
-	SendMessage("../test/server","SYN J", "buffer1");
+	SendMessage("server","SYN J", "buffer1");
 	WaitAnswer(res, ans, "buffer1");
 
-	WaitMessage("../test/server", msg, "buffer2");
+	WaitMessage("server", msg, "buffer2");
 	SendAnswer("permit", "ACK K+1", "buffer2");
 
 	

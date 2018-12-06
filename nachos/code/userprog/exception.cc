@@ -31,6 +31,7 @@
 #include "interrupt.h"
 #include "machine.h"
 #include "bufferpool.h"
+#include "messagebuffer.h"
 
 
 #include <stdlib.h>
@@ -142,7 +143,7 @@ ExceptionHandler(ExceptionType which)
           IntStatus oldLevel = kernel->interrupt->SetLevel(IntOff); 
           kernel->interrupt->SetLevel(IntOff);
 
-          cout << "sending message! called by: " << kernel->currentThread->getName()  << endl;
+          cout << "---------Sys call: sending message called by: " << kernel->currentThread->getName() << "-----------"  << endl;
           int receiverAddr = kernel->machine->ReadRegister(4);
           int msgAddr = kernel->machine->ReadRegister(5);
           int bufferAddr = kernel->machine->ReadRegister(6);
@@ -151,14 +152,23 @@ ExceptionHandler(ExceptionType which)
           string bufferName = getStringInMem(bufferAddr);
           string sender = std::string(kernel->currentThread->getName());
 
-          cout << "sender: " << sender << " receiver: " << receiver << " message: " << message << " bufferName: " << bufferName << endl;
+          cout << "sender: " << sender << " ,receiver: " << receiver << " .message: " << message << " .bufferName: " << bufferName << endl;
 
+          if (kernel->bufferpool->reachLimit()) {
+            cout << "over bufferPool's limit" << endl;
+            break;
+          }
+
+          if (kernel->isThreadExist(receiver) && kernel->getThread(receiver)->reachLimit()) {
+            cout << "over receiver: "<< receiver << "\'s queue limitation" << endl;
+            break;
+          }
 
           if (kernel->isThreadExist(receiver) && kernel->getThread(receiver)->contains(bufferName)) {
             MsgBuffer *buffer = kernel->bufferPool->Search(bufferName);
             buffer->setMessage(message);
             buffer->setStatus(true);
-            cout << " receiver: " << receiver << " is waiting for message in buffer: " << bufferName << " acitve receiver" << endl;
+            cout << " receiver: " << receiver << " is waiting for message in buffer: " << bufferName << " ,acitve receiver" << endl;
 
             kernel->scheduler->ReadyToRun(kernel->getThread(receiver));
                         
@@ -188,7 +198,7 @@ ExceptionHandler(ExceptionType which)
           IntStatus oldLevel = kernel->interrupt->SetLevel(IntOff); 
           kernel->interrupt->SetLevel(IntOff);
 
-          cout << "waiting message! called by: "<< kernel->currentThread->getName() << endl;
+          cout << "---------Sys call waiting message called by: "<< kernel->currentThread->getName() << "-----------" << endl;
           int senderAddr = kernel->machine->ReadRegister(4);
           int msgAddr = kernel->machine->ReadRegister(5);
           int bufferAddr = kernel->machine->ReadRegister(6);
@@ -196,14 +206,24 @@ ExceptionHandler(ExceptionType which)
           string bufferName = getStringInMem(bufferAddr);
           string receiver = std::string(kernel->currentThread->getName());
 
-          cout << "sender: " << sender << " receiver: " << receiver << " bufferName: " << bufferName << endl;
+          cout << "sender: " << sender << " ,receiver: " << receiver << " ,bufferName: " << bufferName << endl;
           
           if (kernel->currentThread->contains(bufferName)) {
             MsgBuffer *buffer = kernel->bufferPool->Search(bufferName);
-            cout << "buffer: " << bufferName << " has already in queue, message: " << buffer->getMessage() << " from sender: " << sender << endl;
+            cout << "buffer: " << bufferName << " has already in queue, message: " << buffer->getMessage() << " ,from sender: " << sender << endl;
             writeInToMen(buffer->getMessage(), msgAddr);
           }
           else if (kernel->isThreadExist(sender)) {
+            if (kernel->bufferpool->reachLimit()) {
+              cout << "over bufferPool's limit" << endl;
+              break;
+            }
+
+            if (kernel->isThreadExist(receiver) && kernel->getThread(receiver)->reachLimit()) {
+              cout << "over receiver: "<< receiver << "\'s queue limitation" << endl;
+              break;
+            }
+
             MsgBuffer *buffer = kernel->bufferPool->FindNextToUse(bufferName);
             buffer->setSender(sender);
             buffer->setReceiver(receiver);
@@ -216,7 +236,7 @@ ExceptionHandler(ExceptionType which)
 
             kernel->currentThread->Sleep(FALSE);
 
-            cout << "message: " << buffer->getMessage() << " from sender: " << sender << "in buffer : " << bufferName << " arrived" << endl;
+            cout << "message: " << buffer->getMessage() << " ,from sender: " << sender << " ,in buffer : " << bufferName << " arrived" << endl;
  
             writeInToMen(buffer->getMessage(), msgAddr);
             
@@ -237,7 +257,7 @@ ExceptionHandler(ExceptionType which)
           IntStatus oldLevel = kernel->interrupt->SetLevel(IntOff); 
           kernel->interrupt->SetLevel(IntOff);
 
-          cout << "sending answer! called by: " << kernel->currentThread->getName()  << endl;
+          cout << "---------Sys call sending answer called by: " << kernel->currentThread->getName() << "-----------"  << endl;
           int resAddr = kernel->machine->ReadRegister(4);
           int ansAddr = kernel->machine->ReadRegister(5);
           int bufferAddr = kernel->machine->ReadRegister(6);
@@ -253,7 +273,7 @@ ExceptionHandler(ExceptionType which)
           buffer->setAnswer(answer);
           buffer->setResult(result);
 
-          cout << receiver << " send back result: " << result << " ,and answer: " << answer << " to " << sender << " ,using bufferName: " << bufferName << endl;
+          cout << receiver << " send back result: " << result << " ,and answer: " << answer << " ,to " << sender << " ,using buffer: " << bufferName << endl;
 
           if (kernel->bufferPool->Search(bufferName) == NULL) {
             cout << "error! no buffer exits!" << endl;
@@ -262,12 +282,16 @@ ExceptionHandler(ExceptionType which)
 
           if (kernel->isThreadExist(sender) && kernel->getThread(sender)->contains(bufferName)) {
             
-            cout << sender << " is waiting for answer in buffer: " << bufferName << " acitve original sender" << endl;
+            cout << sender << " is waiting for answer in buffer: " << bufferName << " ,acitve original sender" << endl;
             kernel->scheduler->ReadyToRun(kernel->getThread(sender));
 
           }
           else if (kernel->isThreadExist(sender)) {
-            cout << receiver << "delivers answer in buffer: " << bufferName << " to original sender: " << sender << endl;
+            if (kernel->getThread(sender)->reachLimit()) {
+              cout << "over sender: "<< sender << "\'s queue limitation" << endl;
+              break;
+            }
+            cout << receiver << " delivers answer in buffer: " << bufferName << " ,to original sender: " << sender << endl;
             kernel->getThread(sender)->addBuffer(buffer);
           }
           else {
@@ -279,7 +303,7 @@ ExceptionHandler(ExceptionType which)
 
         case SC_WaitAnswer:
         {
-          cout << "waiting answer! called by: " << kernel->currentThread->getName()  << endl;
+          cout << "---------Sys call waiting answer called by: " << kernel->currentThread->getName() << "-----------"  << endl;
           IntStatus oldLevel = kernel->interrupt->SetLevel(IntOff); 
           kernel->interrupt->SetLevel(IntOff);
 
@@ -303,6 +327,10 @@ ExceptionHandler(ExceptionType which)
             writeInToMen(buffer->getResult(), resAddr);
           }
           else if (kernel->isThreadExist(buffer->getReceiver())) {
+            if (kernel->getThread(buffer->getSender())->reachLimit()) {
+              cout << "over sender: "<< buffer->getSender() << "\'s queue limitation" << endl;
+              break;
+            }
             kernel->currentThread->addBuffer(buffer);
 
             cout << "buffer: " << bufferName << " not yet received, delay until this buffer arrives" << endl;
@@ -342,7 +370,9 @@ ExceptionHandler(ExceptionType which)
 
         case SC_Exit:
         {
-          //printf("Exit system call made by %s\n", kernel->currentThread->getName());
+          cout << "---------Sys call exit called by: " << kernel->currentThread->getName() << "-----------"  << endl;
+
+
           kernel->currentThread->Finish();
           break;
         } 

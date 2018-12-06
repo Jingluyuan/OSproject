@@ -12,11 +12,11 @@ int main() {
 	ThreadYield();
 	Write(str, 30, output);
 	
-	WaitMessage("../test/client", msg, "buffer1");
+	WaitMessage("client", msg, "buffer1");
 	Write(msg, 5, output);
 
 	SendAnswer("permit", "ACK J+1", "buffer1");
-	SendMessage("../test/client", "SYN K", "buffer2");
+	SendMessage("client", "SYN K", "buffer2");
 		
 	WaitAnswer(res, ans, "buffer2");
 		

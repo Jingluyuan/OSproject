@@ -46,6 +46,13 @@
 #include "openfile.h"
 #include "sysdep.h"
 
+#include <stdlib.h>
+#include <stdio.h>
+#include <string> 
+#include <string.h>
+#include <iostream>
+#include <cstring>
+
 // global variables
 Kernel *kernel;
 Debug *debug;
@@ -304,9 +311,13 @@ main(int argc, char **argv)
     if (userProgName != NULL && idx > 0) {
       //RunUserProg(userProgName);
         for (int i = 0; i < idx; i++) {
-            Thread *t = new Thread(userProgName[i]);
+            string str = std::string(userProgName[i]);
+            std::size_t found = str.find_last_of("/");
+            string name = str.substr(found+1);
+            char * cstr = new char [name.length()+1];
+            std::strcpy (cstr, name.c_str());
+            Thread *t = new Thread(cstr);
             t->Fork((VoidFunctionPtr) RunUserProg,userProgName[i]);
-            //cout << "forking" << userProgName[i] << endl;
         }
         
     }
