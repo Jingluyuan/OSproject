@@ -112,7 +112,11 @@ ifeq ($(hosttype),unknown)
 PROGRAMS = unknownhost
 else
 # change this if you create a new test program!
+<<<<<<< Updated upstream
 PROGRAMS = add halt shell matmult sort segments client server uprog1 uprog2_client uprog2_server uprog3_client uprog3_server uprog4
+=======
+PROGRAMS = add halt shell matmult sort segments client server uprog1 uprog2_client uprog2_server uprog3_A  uprog3_B uprog3_C uprog4 uprog5_client uprog5_server1 uprog5_server2 uprog5_server3 
+>>>>>>> Stashed changes
 endif
 
 all: $(PROGRAMS)
@@ -187,23 +191,53 @@ uprog2_server: uprog2_server.o start.o
 	$(LD) $(LDFLAGS) start.o uprog2_server.o -o uprog2_server.coff
 	$(COFF2NOFF) uprog2_server.coff uprog2_server
 
-uprog3_client.o: uprog3_client.c
-	$(CC) $(CFLAGS) -c uprog3_client.c
-uprog3_client: uprog3_client.o start.o
-	$(LD) $(LDFLAGS) start.o uprog3_client.o -o uprog3_client.coff
-	$(COFF2NOFF) uprog3_client.coff uprog3_client
+uprog3_A.o: uprog3_A.c
+	$(CC) $(CFLAGS) -c uprog3_A.c
+uprog3_A: uprog3_A.o start.o
+	$(LD) $(LDFLAGS) start.o uprog3_A.o -o uprog3_A.coff
+	$(COFF2NOFF) uprog3_A.coff uprog3_A
 
-uprog3_server.o: uprog3_server.c
-	$(CC) $(CFLAGS) -c uprog3_server.c
-uprog3_server: uprog3_server.o start.o
-	$(LD) $(LDFLAGS) start.o uprog3_server.o -o uprog3_server.coff
-	$(COFF2NOFF) uprog3_server.coff uprog3_server
+uprog3_B.o: uprog3_B.c
+	$(CC) $(CFLAGS) -c uprog3_B.c
+uprog3_B: uprog3_B.o start.o
+	$(LD) $(LDFLAGS) start.o uprog3_B.o -o uprog3_B.coff
+	$(COFF2NOFF) uprog3_B.coff uprog3_B
+
+uprog3_C.o: uprog3_C.c
+	$(CC) $(CFLAGS) -c uprog3_C.c
+uprog3_C: uprog3_C.o start.o
+	$(LD) $(LDFLAGS) start.o uprog3_C.o -o uprog3_C.coff
+	$(COFF2NOFF) uprog3_C.coff uprog3_C
 
 uprog4.o: uprog4.c
 	$(CC) $(CFLAGS) -c uprog4.c
 uprog4: uprog4.o start.o
 	$(LD) $(LDFLAGS) start.o uprog4.o -o uprog4.coff
 	$(COFF2NOFF) uprog4.coff uprog4
+
+uprog5_client.o: uprog5_client.c
+	$(CC) $(CFLAGS) -c uprog5_client.c
+uprog5_client: uprog5_client.o start.o
+	$(LD) $(LDFLAGS) start.o uprog5_client.o -o uprog5_client.coff
+	$(COFF2NOFF) uprog5_client.coff uprog5_client
+
+uprog5_server1.o: uprog5_server1.c
+	$(CC) $(CFLAGS) -c uprog5_server1.c
+uprog5_server1: uprog5_server1.o start.o
+	$(LD) $(LDFLAGS) start.o uprog5_server1.o -o uprog5_server1.coff
+	$(COFF2NOFF) uprog5_server1.coff uprog5_server1
+
+uprog5_server2.o: uprog5_server2.c
+	$(CC) $(CFLAGS) -c uprog5_server2.c
+uprog5_server2: uprog5_server2.o start.o
+	$(LD) $(LDFLAGS) start.o uprog5_server2.o -o uprog5_server2.coff
+	$(COFF2NOFF) uprog5_server2.coff uprog5_server2
+
+uprog5_server3.o: uprog5_server3.c
+	$(CC) $(CFLAGS) -c uprog5_server3.c
+uprog5_server3: uprog5_server3.o start.o
+	$(LD) $(LDFLAGS) start.o uprog5_server3.o -o uprog5_server3.coff
+	$(COFF2NOFF) uprog5_server3.coff uprog5_server3
 
 clean:
 	$(RM) -f *.o *.ii
