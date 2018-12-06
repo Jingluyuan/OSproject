@@ -169,6 +169,42 @@ server: server.o start.o
 	$(LD) $(LDFLAGS) start.o server.o -o server.coff
 	$(COFF2NOFF) server.coff server
 
+uprog1.o: uprog1.c
+	$(CC) $(CFLAGS) -c uprog1.c
+uprog1: uprog1.o start.o
+	$(LD) $(LDFLAGS) start.o uprog1.o -o uprog1.coff
+	$(COFF2NOFF) uprog1.coff uprog1
+
+uprog2_client.o: uprog2_client.c
+	$(CC) $(CFLAGS) -c uprog2_client.c
+uprog2_client: uprog2_client.o start.o
+	$(LD) $(LDFLAGS) start.o uprog2_client.o -o uprog2_client.coff
+	$(COFF2NOFF) uprog2_client.coff uprog2_client
+
+uprog2_server.o: uprog2_server.c
+	$(CC) $(CFLAGS) -c uprog2_server.c
+uprog2_server: uprog2_server.o start.o
+	$(LD) $(LDFLAGS) start.o uprog2_server.o -o uprog2_server.coff
+	$(COFF2NOFF) uprog2_server.coff uprog2_server
+
+uprog3_client.o: uprog3_client.c
+	$(CC) $(CFLAGS) -c uprog3_client.c
+uprog3_client: uprog3_client.o start.o
+	$(LD) $(LDFLAGS) start.o uprog3_client.o -o uprog3_client.coff
+	$(COFF2NOFF) uprog3_client.coff uprog3_client
+
+uprog3_server.o: uprog3_server.c
+	$(CC) $(CFLAGS) -c uprog3_server.c
+uprog3_server: uprog3_server.o start.o
+	$(LD) $(LDFLAGS) start.o uprog3_server.o -o uprog3_server.coff
+	$(COFF2NOFF) uprog3_server.coff uprog3_server
+
+uprog4.o: uprog4.c
+	$(CC) $(CFLAGS) -c uprog4.c
+uprog4: uprog4.o start.o
+	$(LD) $(LDFLAGS) start.o uprog4.o -o uprog4.coff
+	$(COFF2NOFF) uprog4.coff uprog4
+
 clean:
 	$(RM) -f *.o *.ii
 	$(RM) -f *.coff
