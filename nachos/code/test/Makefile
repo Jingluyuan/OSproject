@@ -115,7 +115,7 @@ else
 <<<<<<< Updated upstream
 PROGRAMS = add halt shell matmult sort segments client server uprog1 uprog2_client uprog2_server uprog3_client uprog3_server uprog4
 =======
-PROGRAMS = add halt shell matmult sort segments client server uprog1 uprog2_client uprog2_server uprog3_A  uprog3_B uprog3_C uprog4 uprog5_client uprog5_server1 uprog5_server2 uprog5_server3 
+PROGRAMS = add halt shell matmult sort segments client server uprog1 uprog2_client uprog2_server uprog3_A  uprog3_B uprog3_C uprog4 uprog5_client uprog5_server1 uprog5_server2 uprog5_server3 uprog6_client uprog6_server uprog7_client uprog7_server
 >>>>>>> Stashed changes
 endif
 
@@ -238,6 +238,30 @@ uprog5_server3.o: uprog5_server3.c
 uprog5_server3: uprog5_server3.o start.o
 	$(LD) $(LDFLAGS) start.o uprog5_server3.o -o uprog5_server3.coff
 	$(COFF2NOFF) uprog5_server3.coff uprog5_server3
+
+uprog6_client.o: uprog6_client.c
+	$(CC) $(CFLAGS) -c uprog6_client.c
+uprog6_client: uprog6_client.o start.o
+	$(LD) $(LDFLAGS) start.o uprog6_client.o -o uprog6_client.coff
+	$(COFF2NOFF) uprog6_client.coff uprog6_client
+
+uprog6_server.o: uprog6_server.c
+	$(CC) $(CFLAGS) -c uprog6_server.c
+uprog6_server: uprog6_server.o start.o
+	$(LD) $(LDFLAGS) start.o uprog6_server.o -o uprog6_server.coff
+	$(COFF2NOFF) uprog6_server.coff uprog6_server
+
+uprog7_client.o: uprog7_client.c
+	$(CC) $(CFLAGS) -c uprog7_client.c
+uprog7_client: uprog7_client.o start.o
+	$(LD) $(LDFLAGS) start.o uprog7_client.o -o uprog7_client.coff
+	$(COFF2NOFF) uprog7_client.coff uprog7_client
+
+uprog7_server.o: uprog7_server.c
+	$(CC) $(CFLAGS) -c uprog7_server.c
+uprog7_server: uprog7_server.o start.o
+	$(LD) $(LDFLAGS) start.o uprog7_server.o -o uprog7_server.coff
+	$(COFF2NOFF) uprog7_server.coff uprog7_server
 
 clean:
 	$(RM) -f *.o *.ii

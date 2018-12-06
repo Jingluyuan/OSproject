@@ -1,8 +1,10 @@
 #include "syscall.h"
 
+
 int main() {
 	OpenFileId output = ConsoleOutput;
+	char* msg;
 	ThreadYield();
-	SendMessage("uprog5_server1","Hello from client", "buffer1");
+	WaitMessage("uprog7_client", msg, "buffer1");
 	Exit(0);
 }
