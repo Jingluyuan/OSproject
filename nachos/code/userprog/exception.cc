@@ -291,9 +291,9 @@ ExceptionHandler(ExceptionType which)
 
           buffer->setAnswer(answer);
           buffer->setResult(result);
-          buffer->setUsingStatus(SEND_ANSWER);
+          
 
-          if (kernel->isThreadExist(sender) && kernel->bufferPool->Search(bufferName) != NULL) {
+          if (kernel->isThreadExist(sender) && buffer->getUsingStatus() == WAIT_ANSWER) {
             
             cout << sender << " is waiting for answer in buffer: " << bufferName << " ,acitve original sender" << endl;
             kernel->scheduler->ReadyToRun(kernel->getThread(sender));
@@ -311,6 +311,7 @@ ExceptionHandler(ExceptionType which)
             cout << "error, original sender dose not exist" << endl;
             buffer->setStatus(false);
           }
+          buffer->setUsingStatus(SEND_ANSWER);
           kernel->interrupt->SetLevel(oldLevel);
           break;
         }
@@ -352,7 +353,7 @@ ExceptionHandler(ExceptionType which)
             buffer->setUsingStatus(WAIT_ANSWER);
             kernel->currentThread->Sleep(FALSE);
 
-            cout << "-----------" << kernel->currentThread->getName() << " received waiting message---------" << endl;
+            cout << "-----------" << kernel->currentThread->getName() << " received waiting answer---------" << endl;
             
             if (buffer->getAnswer().compare("dummy message") == 0)
               cout << "answer: " << buffer->getAnswer() << " ,dummy answer from system, due to waiting sender terminates" << endl;
