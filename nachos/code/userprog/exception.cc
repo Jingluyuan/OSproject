@@ -101,14 +101,7 @@ ExceptionHandler(ExceptionType which)
   DEBUG(dbgSys, "Received Exception " << which << " type: " << type << "\n");
   
   switch (which) {
-    // case PageFaultException:
-    // {
-    //   //cout<<"page fault\n";
-    //   kernel->currentThread->space->PageFaultHandler();
-    //   return;
-      
-    // break;
-    // }
+
     case SyscallException:
     {
       switch(type) {
@@ -152,7 +145,7 @@ ExceptionHandler(ExceptionType which)
           string bufferName = getStringInMem(bufferAddr);
           string sender = std::string(kernel->currentThread->getName());
 
-          cout << "sender: " << sender << " ,receiver: " << receiver << " .message: " << message << " .bufferName: " << bufferName << endl;
+          cout << "sender: " << sender << " ,receiver: " << receiver << " ,message: " << message << " ,bufferName: " << bufferName << endl;
 
           if (kernel->bufferPool->reachLimit()) {
             cout << "over bufferPool's limit" << endl;
@@ -169,7 +162,7 @@ ExceptionHandler(ExceptionType which)
             buffer->setMessage(message);
             buffer->setStatus(true);
             buffer->setUsingStatus(SEND_MESSAGE);
-            cout << " receiver: " << receiver << " is waiting for message in buffer: " << bufferName << " ,acitve receiver" << endl;
+            cout << "receiver: " << receiver << " is waiting for message in buffer: " << bufferName << " ,acitve receiver" << endl;
 
             kernel->scheduler->ReadyToRun(kernel->getThread(receiver));
                         
@@ -241,8 +234,10 @@ ExceptionHandler(ExceptionType which)
 
             kernel->currentThread->Sleep(FALSE);
 
+            cout << "-----------" << kernel->currentThread->getName() << " received waiting message---------" << endl;
+
             if (buffer->getMessage().compare("dummy message") == 0)
-              cout << "dummy message from system, due to waiting sender terminates" << endl;
+              cout << "message: " << buffer->getMessage() << " ,dummy message from system, due to waiting sender terminates" << endl;
             else 
               cout << "message: " << buffer->getMessage() << " ,from sender: " << sender << " ,in buffer : " << bufferName << " arrived" << endl;
  
@@ -350,9 +345,11 @@ ExceptionHandler(ExceptionType which)
             cout << "buffer: " << bufferName << " not yet received, delay until this buffer arrives" << endl;
             buffer->setUsingStatus(WAIT_ANSWER);
             kernel->currentThread->Sleep(FALSE);
+
+            cout << "-----------" << kernel->currentThread->getName() << " received waiting message---------" << endl;
             
-            if (buffer->getMessage().compare("dummy message") == 0)
-              cout << "dummy answer from system, due to waiting sender terminates" << endl;
+            if (buffer->getAnswer().compare("dummy message") == 0)
+              cout << "answer: " << buffer->getAnswer() << " ,dummy answer from system, due to waiting sender terminates" << endl;
             else 
               cout << "buffer: " << bufferName << " received, result: " << buffer->getResult() 
                       << " ,answer: " << buffer->getAnswer() << endl;
