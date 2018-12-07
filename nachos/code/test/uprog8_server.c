@@ -6,6 +6,6 @@ int main() {
 	char* msg;
 	ThreadYield();
 	WaitMessage("uprog8_client1", msg, "buffer1");
-	SendAnswer("permit", "ACK J+1", "buffer1");
+	WaitMessage("uprog8_client2", msg, "buffer2");
 	Exit(0);
 }
