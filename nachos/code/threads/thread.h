@@ -111,11 +111,21 @@ class Thread {
     void Print() { cout << name; }
     void SelfTest();		// test whether thread impl is working
 
+
+    // Liqun Zhou Update---------------------------
+    // To realize the communication between 2 threads(processes),
+    // every threads need a data structure to store the MessageBuffer
+    // We use List in Nacho System here, and the limitation is 10.
+    // In addition, we define some functions to help thread manage
+    // MessageBuffer.
+
     bool deliverBuffer(MsgBuffer* msgbuffer); //deliverBuffer from pool to queue
     bool removeBuffer(string buffer_id); //remove specific buffer from queue
     bool contains(string buffer_id); //whether thread get buffer
     void addBuffer(MsgBuffer* msgbuffer); //add buffer to queue
     bool reachLimit();
+    // Liqun Zhou Update-------------------------
+
     //List<MsgBuffer *>* getMsgQueue() {return (MessageQueue);};
   private:
     // some of the private data for this class is listed above
@@ -136,7 +146,7 @@ class Thread {
 
     int userRegisters[NumTotalRegs];	// user-level CPU register state
 
-    List<MsgBuffer *> *MessageQueue;
+    List<MsgBuffer *> *MessageQueue; // A list to store MessageBuffer, the default size is 10.
 
   public:
     void SaveUserState();		// save user-level register state

@@ -445,6 +445,11 @@ Thread::SelfTest()
     SimpleThread(0);
 }
 
+
+
+// Liqun Zhou Update---------------------------
+
+
 //----------------------------------------------------------------------
 //  Thread::deliverBuffer
 //  Deliver a buffer from pool to queue 

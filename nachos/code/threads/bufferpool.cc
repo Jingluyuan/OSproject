@@ -20,7 +20,10 @@ BufferPool::~BufferPool(){
 //----------------------------------------------------------------------
 //	MsgBuffer* BufferPool::FindNextToUse()
 //	Find next clean buffer to use 		
-//	If there is no clean buffer, return NULL
+//	It will return a clean MessageBuffer in
+//  Buffer pool, if there is no clean buffer
+//  in buffer pool, we will generate a new 
+//  message buffer.
 //----------------------------------------------------------------------
 
 MsgBuffer*
@@ -84,6 +87,11 @@ BufferPool::reachLimit(){
  }
 
 
+//----------------------------------------------------------------------
+//	MsgBuffer* BufferPool::SearchBySender(char* buffer_id)
+//	After kernel initialize the clean buffer, get this modified buffer		
+//	based on its sender.
+//----------------------------------------------------------------------
 
 MsgBuffer*
 BufferPool::SearchBySender(string sender_id){
@@ -99,6 +107,11 @@ BufferPool::SearchBySender(string sender_id){
 	return NULL;
 }
 
+//----------------------------------------------------------------------
+//	MsgBuffer* BufferPool::SearchByReceiver(char* buffer_id)
+//	After kernel initialize the clean buffer, get this modified buffer		
+//	based on its sender.
+//----------------------------------------------------------------------
 
 MsgBuffer*
 BufferPool::SearchByReceiver(string receiver_id){
