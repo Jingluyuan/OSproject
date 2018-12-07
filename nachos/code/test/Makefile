@@ -112,7 +112,7 @@ ifeq ($(hosttype),unknown)
 PROGRAMS = unknownhost
 else
 # change this if you create a new test program!
-PROGRAMS = add halt shell matmult sort segments client server uprog1 uprog2_client uprog2_server uprog3_A  uprog3_B uprog3_C uprog4 uprog5_client uprog5_server1 uprog5_server2 uprog5_server3 uprog6_client uprog6_server uprog7_client uprog7_server
+PROGRAMS = add halt shell matmult sort segments client server uprog1 uprog2_client uprog2_server uprog3_A  uprog3_B uprog3_C uprog4 uprog5_client uprog5_server1 uprog5_server2 uprog5_server3 uprog6_client uprog6_server uprog7_client uprog7_server uprog8_server uprog8_client1 uprog8_client2
 endif
 
 all: $(PROGRAMS)
@@ -258,6 +258,24 @@ uprog7_server.o: uprog7_server.c
 uprog7_server: uprog7_server.o start.o
 	$(LD) $(LDFLAGS) start.o uprog7_server.o -o uprog7_server.coff
 	$(COFF2NOFF) uprog7_server.coff uprog7_server
+
+uprog8_server.o: uprog8_server.c
+	$(CC) $(CFLAGS) -c uprog8_server.c
+uprog8_server: uprog8_server.o start.o
+	$(LD) $(LDFLAGS) start.o uprog8_server.o -o uprog8_server.coff
+	$(COFF2NOFF) uprog8_server.coff uprog8_server
+
+uprog8_client1.o: uprog8_client1.c
+	$(CC) $(CFLAGS) -c uprog8_client1.c
+uprog8_client1: uprog8_client1.o start.o
+	$(LD) $(LDFLAGS) start.o uprog8_client1.o -o uprog8_client1.coff
+	$(COFF2NOFF) uprog8_client1.coff uprog8_client1
+
+uprog8_client2.o: uprog8_client2.c
+	$(CC) $(CFLAGS) -c uprog8_client2.c
+uprog8_client2: uprog8_client2.o start.o
+	$(LD) $(LDFLAGS) start.o uprog8_client2.o -o uprog8_client2.coff
+	$(COFF2NOFF) uprog8_client2.coff uprog8_client2
 
 clean:
 	$(RM) -f *.o *.ii

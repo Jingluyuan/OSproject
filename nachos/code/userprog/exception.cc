@@ -61,6 +61,8 @@
 //  "which" is the kind of exception.  The list of possible exceptions
 //  is in machine.h.
 //----------------------------------------------------------------------
+
+//function to read from memory
 string getStringInMem(int addr) {
   string name;
   int c;
@@ -87,6 +89,7 @@ string getStringInMem(int addr) {
 
 }
 
+//function to write to memory
 void writeInToMen(string str, int ptr) {
   for (int i = ptr, j = 0; j < str.length(); i++, j++) {
     kernel->machine->WriteMem(i, 1, (int)str.at(j));
@@ -131,6 +134,11 @@ ExceptionHandler(ExceptionType which)
           break;
         }
 
+        //copy message into the first available buffer within the pool and delivers it in the queue of named receiver
+        //activated the receiver who waiting on this message
+        //if over the limit of receiver's queue, the message will not send to the receiver
+        //if the buffer pool can not find a availabel buffer, the message will not send to the receiver
+        //if the receiver dose not exist, print a error message.
         case SC_SendMessage:
         {
           IntStatus oldLevel = kernel->interrupt->SetLevel(IntOff); 
@@ -148,12 +156,12 @@ ExceptionHandler(ExceptionType which)
           cout << "sender: " << sender << " ,receiver: " << receiver << " ,message: " << message << " ,bufferName: " << bufferName << endl;
 
           if (kernel->bufferPool->reachLimit()) {
-            cout << "over bufferPool's limit" << endl;
+            cout << "error! could not find available buffer in buffer pool" << endl;
             break;
           }
 
           if (kernel->isThreadExist(receiver) && kernel->getThread(receiver)->reachLimit()) {
-            cout << "over receiver: "<< receiver << "\'s queue limitation" << endl;
+            cout << "error! over receiver: "<< receiver << "\'s queue limitation" << endl;
             break;
           }
 
@@ -188,6 +196,10 @@ ExceptionHandler(ExceptionType which)
           break;
         }
 
+        //delay requesting process until a message arrives in the process's queue, may be a dummy message from system
+        //if the message has already arrived, process it directly.
+        //if sender does not exist, print a error message.
+        //remove the buffer from queue.
         case SC_WaitMessage:
         {
           IntStatus oldLevel = kernel->interrupt->SetLevel(IntOff); 
@@ -211,16 +223,7 @@ ExceptionHandler(ExceptionType which)
             kernel->currentThread->removeBuffer(bufferName);
           }
           else if (kernel->isThreadExist(sender)) {
-            if (kernel->bufferPool->reachLimit()) {
-              cout << "over bufferPool's limit" << endl;
-              break;
-            }
-
-            if (kernel->isThreadExist(receiver) && kernel->getThread(receiver)->reachLimit()) {
-              cout << "over receiver: "<< receiver << "\'s queue limitation" << endl;
-              break;
-            }
-
+            
             MsgBuffer *buffer = kernel->bufferPool->FindNextToUse(bufferName);
             buffer->setSender(sender);
             buffer->setReceiver(receiver);
@@ -245,7 +248,7 @@ ExceptionHandler(ExceptionType which)
             
           }
           else {
-            cout << "sender: " << sender << " dose not exist! write a dummy message back" << endl;
+            cout << "error! sender: " << sender << " dose not exist! write a dummy message back" << endl;
             writeInToMen("message from kerenl, sender dose not exist!", msgAddr);
             break;
           }
@@ -254,6 +257,11 @@ ExceptionHandler(ExceptionType which)
           break;
         }
 
+        //copy an answer in which message has been received
+        //deliver it to queue of original sender 
+        //the sender of the message is activated if it is waiting for the answer
+        //if the buffer dose not in pool, print a error message
+        //if origin sender terminated, print a error message and the answer will not send
         case SC_SendAnswer: //receiver and sender reverse
         {
           IntStatus oldLevel = kernel->interrupt->SetLevel(IntOff); 
@@ -293,7 +301,7 @@ ExceptionHandler(ExceptionType which)
           }
           else if (kernel->isThreadExist(sender)) {
             if (kernel->getThread(sender)->reachLimit()) {
-              cout << "over sender: "<< sender << "\'s queue limitation" << endl;
+              cout << "erro! over original sender: "<< sender << "\'s queue limitation" << endl;
               break;
             }
             cout << receiver << " delivers answer in buffer: " << bufferName << " ,to original sender: " << sender << endl;
@@ -301,11 +309,14 @@ ExceptionHandler(ExceptionType which)
           }
           else {
             cout << "error, original sender dose not exist" << endl;
+            buffer->setStatus(false);
           }
           kernel->interrupt->SetLevel(oldLevel);
           break;
         }
 
+        //delays the requesting process until answer arrives in a given buffer
+        //On arrival, the answer is copied into the process, and return the buffer to pool
         case SC_WaitAnswer:
         {
           IntStatus oldLevel = kernel->interrupt->SetLevel(IntOff); 
@@ -336,12 +347,7 @@ ExceptionHandler(ExceptionType which)
             cout << "remove buffer: " << bufferName << " from queue" << endl;
           }
           else if (kernel->isThreadExist(buffer->getReceiver())) {
-            if (kernel->getThread(buffer->getSender())->reachLimit()) {
-              cout << "over sender: "<< buffer->getSender() << "\'s queue limitation" << endl;
-              break;
-            }
-            //kernel->currentThread->addBuffer(buffer);
-
+ 
             cout << "buffer: " << bufferName << " not yet received, delay until this buffer arrives" << endl;
             buffer->setUsingStatus(WAIT_ANSWER);
             kernel->currentThread->Sleep(FALSE);
@@ -360,6 +366,8 @@ ExceptionHandler(ExceptionType which)
             cout << "origin receiver: " << buffer->getReceiver() << " dose not exist! write a dummy message back" << endl;
             writeInToMen("message from kerenl, receiver dose not exist!", ansAddr);
           }
+
+          cout << "buffer: " << bufferName << " returned to pool" << endl;
 
           buffer->setStatus(false);
           
@@ -409,6 +417,7 @@ ExceptionHandler(ExceptionType which)
           while (buffer != NULL) {
             string senderTmp = buffer->getSender();
             buffer->setAnswer("dummy message");
+            buffer->setResult("dummy message");
             buffer->setUsingStatus(SEND_ANSWER);
             cout << "sending dummy answer to original sender: " << senderTmp << endl;
             kernel->scheduler->ReadyToRun(kernel->getThread(senderTmp));
